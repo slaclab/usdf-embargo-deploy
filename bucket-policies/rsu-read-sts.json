@@ -3,7 +3,7 @@
   "Statement": [{
     "Sid": "allow-rubin-summit-users-read-rubin-sts",
     "Effect": "Allow",
-    "Principal": {"AWS": ["arn:aws:iam:::user/rubin-summit-users"]},
+    "Principal": {"AWS": ["arn:aws:iam::rubin:user/rubin-summit-users"]},
     "Action": [
       "s3:GetBucketLocation",
       "s3:GetObject",
