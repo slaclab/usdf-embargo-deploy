@@ -11,7 +11,7 @@ data:
   sts_butler_repo: /repo/ir2
   summit_bucket: rubin-summit
   summit_butler_repo: /repo/oga
-  test_bucket: oga-test
+  test_bucket: rubin-summit-dev
   test_butler_repo: /home/lsst/repo
   tts_bucket: rubin-tts
   tts_butler_repo: /repo/tts
