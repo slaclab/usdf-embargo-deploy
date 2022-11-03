@@ -9,14 +9,14 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ingest
+      app: idle
   template:
     metadata:
       labels:
-        app: ingest
+        app: idle
     spec:
       containers:
-      - name: ingest
+      - name: idle
         image: "ghcr.io/lsst-dm/oga-butler-idle:latest"
         env:
         - name: REDIS_HOST
