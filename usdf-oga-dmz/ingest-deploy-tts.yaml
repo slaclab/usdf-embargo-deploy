@@ -65,12 +65,12 @@ spec:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
-              name: oga-butler-ingest-secret
+              name: s3
               key: s3_access
         - name: AWS_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
-              name: oga-butler-ingest-secret
+              name: s3
               key: s3_key
         resources:
           limits:
