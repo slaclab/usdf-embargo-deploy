@@ -5,10 +5,8 @@ metadata:
   name: oga-butler-redis
   labels:
     app: redis
-  annotations:
-    metallb.universe.tf/address-pool: sdf-services
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   internalTrafficPolicy: Cluster
   ports:
   - name: redis
@@ -46,6 +44,11 @@ spec:
       labels:
         app: redis
     spec:
+      securityContext:
+        fsGroup: 999
+        runAsGroup: 999
+        runAsNonRoot: true
+        runAsUser: 999
       containers:
       - name: redis
         image: "docker.io/redis:7.0.8"
@@ -63,10 +66,26 @@ spec:
             secretKeyRef:
               key: redis-password
               name: redis
+        livenessProbe:
+          exec:
+            command:
+              - sh
+              - '-c'
+              - 'redis-cli -h $(hostname) incr health:counter'
+          failureThreshold: 3
+          initialDelaySeconds: 15
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 1
         resources:
           requests:
             cpu: 100m
             memory: 1Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - all
         ports:
         - containerPort: 6379
         volumeMounts:
