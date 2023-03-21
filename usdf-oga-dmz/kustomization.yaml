@@ -1,0 +1,27 @@
+
+resources:
+- enqueue-deploy.yaml
+- idle-deploy.yaml
+- ingest-config.yaml
+- ingest-deploy-bts.yaml
+- ingest-deploy-oga.yaml
+- ingest-deploy-sts.yaml
+- ingest-deploy-tts.yaml
+- ingest-deploy.yaml
+# redis
+- redis-common.yaml
+- redis-deploy.yaml
+- redis-cm.yaml
+
+secretGenerator:
+- name: s3
+  files:
+  - s3_access=etc/.secrets/access_key
+  - s3_key=etc/.secrets/secret_key
+- name: redis
+  files:
+  - redis_password=etc/.secrets/password
+- name: dbauth
+  files:
+  - db-auth.yaml=etc/.secrets/db-auth.yaml
+
