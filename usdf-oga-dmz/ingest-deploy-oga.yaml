@@ -61,7 +61,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: redis
-              key: redis_password
+              key: redis-password
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
