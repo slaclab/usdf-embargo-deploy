@@ -50,8 +50,8 @@ spec:
         - name: NOTIFICATION_SECRET
           valueFrom:
             secretKeyRef:
-              name: oga-butler-enqueue-secret
-              key: notification_secret
+              name: notification
+              key: secret
         resources:
           limits:
             cpu: "1"
