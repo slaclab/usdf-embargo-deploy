@@ -45,7 +45,7 @@ spec:
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: oga-butler-enqueue-secret
+              name: redis
               key: redis_password
         - name: NOTIFICATION_SECRET
           valueFrom:

@@ -27,7 +27,7 @@ spec:
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: oga-butler-ingest-secret
+              name: redis
               key: redis_password
         resources:
           limits:
