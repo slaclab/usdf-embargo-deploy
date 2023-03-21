@@ -1,5 +1,7 @@
+namespace: prod
 
 resources:
+- ns.yaml
 - enqueue-deploy.yaml
 - idle-deploy.yaml
 - ingest-config.yaml
