@@ -46,15 +46,9 @@ spec:
         - name: REDIS_HOST
           value: redis
         - name: BUCKET
-          valueFrom:
-            configMapKeyRef:
-              name: oga-butler-ingest-config
-              key: test_bucket
+          value: oga-test
         - name: BUTLER_REPO
-          valueFrom:
-            configMapKeyRef:
-              name: oga-butler-ingest-config
-              key: test_butler_repo
+          value: /home/lsst/repo
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:

@@ -45,15 +45,9 @@ spec:
         - name: REDIS_HOST
           value: redis
         - name: BUCKET
-          valueFrom:
-            configMapKeyRef:
-              name: oga-butler-ingest-config
-              key: tts_bucket
+          value: rubin-tts
         - name: BUTLER_REPO
-          valueFrom:
-            configMapKeyRef:
-              name: oga-butler-ingest-config
-              key: tts_butler_repo
+          value: /repo/tts
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
