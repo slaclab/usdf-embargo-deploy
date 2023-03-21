@@ -44,10 +44,7 @@ spec:
               name: oga-butler-ingest-config
               key: s3_url
         - name: REDIS_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: oga-butler-redis-common
-              key: redis_host
+          value: redis
         - name: BUCKET
           valueFrom:
             configMapKeyRef:

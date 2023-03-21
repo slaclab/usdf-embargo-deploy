@@ -38,10 +38,7 @@ spec:
         image: "ghcr.io/lsst-dm/oga-butler-enqueue:latest"
         env:
         - name: REDIS_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: oga-butler-redis-common
-              key: redis_host
+          value: redis
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
