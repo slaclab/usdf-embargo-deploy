@@ -23,7 +23,7 @@ secretGenerator:
 - name: redis
   files:
   - redis_password=etc/.secrets/password
-- name: dbauth
+- name: db-auth
   files:
   - db-auth.yaml=etc/.secrets/db-auth.yaml
 

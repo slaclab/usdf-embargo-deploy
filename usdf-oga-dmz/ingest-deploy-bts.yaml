@@ -83,4 +83,4 @@ spec:
         emptyDir: {}
       - name: db-auth
         secret:
-          secretName: oga-butler-ingest-dbauth
+          secretName: db-auth
