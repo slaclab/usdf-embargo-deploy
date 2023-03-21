@@ -48,13 +48,21 @@ spec:
     spec:
       containers:
       - name: redis
-        image: "docker.io/redis:7.0.4"
+        image: "docker.io/redis:7.0.8"
         command:
         - redis-server
-        - "/config/redis-config"
+        - '--appendonly'
+        - 'yes'
+        - '--requirepass'
+        - $(REDIS_PASSWORD)
         env:
         - name: MASTER
           value: "true"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: redis-password
+              name: redis
         resources:
           requests:
             cpu: 100m
@@ -64,12 +72,7 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: data
-        - mountPath: /config
-          name: config
       volumes:
       - name: data
         persistentVolumeClaim:
           claimName: redis-volume
-      - name: config
-        configMap:
-          name: redis
