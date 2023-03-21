@@ -71,5 +71,5 @@ spec:
         persistentVolumeClaim:
           claimName: redis-volume
       - name: config
-        secret:
-          secretName: oga-butler-redis-config
+        configMap:
+          name: redis

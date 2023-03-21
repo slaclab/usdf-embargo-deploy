@@ -2,8 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: redis
-type: Opaque
-stringData:
+data:
   redis-config: |
     requirepass tmpnotify
     appendonly yes
