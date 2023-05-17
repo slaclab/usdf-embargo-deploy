@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: oga-butler-idle
+  name: sts-butler-idle
   labels:
     app: idle
 spec:
