@@ -1,4 +1,3 @@
-NAMESPACE ?= prod
 SECRET_PATH ?= secret/rubin/usdf-embargo-dmz-dev/
 
 get-secrets-from-vault:
