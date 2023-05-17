@@ -1,0 +1,31 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oga-butler-idle
+  labels:
+    app: idle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: idle
+  template:
+    metadata:
+      labels:
+        app: idle
+    spec:
+      containers:
+      - name: idle
+        image: "ghcr.io/lsst-dm/oga-butler-idle:latest"
+        env:
+        - name: REDIS_HOST
+          value: redis
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis
+              key: redis-password
+        resources:
+          limits:
+            cpu: "0.1"
