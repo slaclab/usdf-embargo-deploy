@@ -1,0 +1,26 @@
+namespace: sts
+
+resources:
+- ns.yaml
+- enqueue-deploy.yaml
+- idle-deploy.yaml
+- ingest-deploy-sts.yaml
+# redis
+- redis-deploy.yaml
+- redis-cm.yaml
+
+secretGenerator:
+- name: s3
+  files:
+  - s3_access=etc/.secrets/access_key
+  - s3_key=etc/.secrets/secret_key
+- name: redis
+  files:
+  - redis-password=etc/.secrets/password
+- name: db-auth
+  files:
+  - db-auth.yaml=etc/.secrets/db-auth.yaml
+- name: notification
+  files:
+  - secret=etc/.secrets/secret
+
