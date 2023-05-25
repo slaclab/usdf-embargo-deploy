@@ -5,9 +5,7 @@ resources:
 - enqueue-deploy.yaml
 - idle-deploy.yaml
 - ingest-deploy-sts.yaml
-# redis
 - redis-deploy.yaml
-- redis-cm.yaml
 
 secretGenerator:
 - name: s3
