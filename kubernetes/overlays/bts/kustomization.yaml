@@ -1,13 +1,21 @@
+images:
+- name: ghcr.io/lsst-dm/embargo-butler-enqueue
+  newTag: "0.91"
+- name: ghcr.io/lsst-dm/embargo-butler-ingest
+  newTag: "0.91"
+- name: ghcr.io/lsst-dm/embargo-butler-idle
+  newTag: "0.91"
+- name: docker.io/redis
+  newTag: "7.0.8"
+
 namespace: bts
 
 resources:
 - ns.yaml
 - enqueue-deploy.yaml
 - idle-deploy.yaml
-- ingest-deploy-bts.yaml
-# redis
+- ingest-deploy.yaml
 - redis-deploy.yaml
-- redis-cm.yaml
 
 secretGenerator:
 - name: s3
@@ -16,11 +24,10 @@ secretGenerator:
   - s3_key=etc/.secrets/secret_key
 - name: redis
   files:
-  - redis-password=etc/.secrets/password
+  - redis-password=etc/.secrets/redis
 - name: db-auth
   files:
   - db-auth.yaml=etc/.secrets/db-auth.yaml
 - name: notification
   files:
-  - secret=etc/.secrets/secret
-
+  - secret=etc/.secrets/notification

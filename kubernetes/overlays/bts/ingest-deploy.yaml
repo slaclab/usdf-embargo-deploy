@@ -20,7 +20,7 @@ spec:
     spec:
       initContainers:
       - name: "fix-secret-permissions"
-        image: "ghcr.io/lsst-dm/oga-butler-ingest:latest"
+        image: "ghcr.io/lsst-dm/embargo-butler-ingest:prod"
         command:
         - "/bin/bash"
         - "-c"
@@ -35,7 +35,7 @@ spec:
           name: secrets
       containers:
       - name: ingest
-        image: "ghcr.io/lsst-dm/oga-butler-ingest:latest"
+        image: "ghcr.io/lsst-dm/embargo-butler-ingest:prod"
         env:
         - name: S3_ENDPOINT_URL
           value: https://s3dfrgw.slac.stanford.edu
@@ -63,6 +63,7 @@ spec:
         resources:
           limits:
             cpu: "1"
+            memory: "2Gi"
         volumeMounts:
         - mountPath: /home/lsst/.lsst
           name: secrets

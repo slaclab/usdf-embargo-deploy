@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sts-butler-ingest
+  name: tts-butler-ingest
   labels:
     app: ingest
-    site: sts
+    site: tts
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: ingest
-      site: sts
+      site: tts
   template:
     metadata:
       labels:
         app: ingest
-        site: sts
+        site: tts
     spec:
       initContainers:
       - name: "fix-secret-permissions"
@@ -42,9 +42,9 @@ spec:
         - name: REDIS_HOST
           value: redis
         - name: BUCKET
-          value: rubin-sts
+          value: rubin-tts
         - name: BUTLER_REPO
-          value: /repo/ir2
+          value: /repo/tts
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
