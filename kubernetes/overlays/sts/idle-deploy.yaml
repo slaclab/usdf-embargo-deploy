@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: idle
-        image: "ghcr.io/lsst-dm/oga-butler-idle:latest"
+        image: "ghcr.io/lsst-dm/embargo-butler-idle:prod"
         env:
         - name: REDIS_HOST
           value: redis

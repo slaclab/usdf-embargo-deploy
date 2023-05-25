@@ -71,7 +71,7 @@ spec:
             command:
               - sh
               - '-c'
-              - 'redis-cli -h $(hostname) incr health:counter'
+              - 'redis-cli -h $(hostname) -a $(REDIS_PASSWORD) incr health:counter'
           failureThreshold: 3
           initialDelaySeconds: 15
           periodSeconds: 60
