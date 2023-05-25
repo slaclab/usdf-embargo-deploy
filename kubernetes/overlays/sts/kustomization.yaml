@@ -1,3 +1,13 @@
+images:
+- name: ghcr.io/lsst-dm/embargo-butler-enqueue
+  newTag: "0.91"
+- name: ghcr.io/lsst-dm/embargo-butler-ingest
+  newTag: "0.91"
+- name: ghcr.io/lsst-dm/embargo-butler-idle
+  newTag: "0.91"
+- name: docker.io/redis
+  newTag: "7.0.8"
+
 namespace: sts
 
 resources:
