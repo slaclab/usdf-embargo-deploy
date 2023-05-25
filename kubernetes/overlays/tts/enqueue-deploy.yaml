@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
       - name: enqueue
-        image: "ghcr.io/lsst-dm/oga-butler-enqueue:latest"
+        image: "ghcr.io/lsst-dm/embargo-butler-enqueue:prod"
         env:
         - name: REDIS_HOST
           value: redis
