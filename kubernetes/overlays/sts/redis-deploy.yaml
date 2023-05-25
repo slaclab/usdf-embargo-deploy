@@ -16,25 +16,14 @@ spec:
   selector:
     app: redis
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: redis-volume
-spec:
-  accessModes:
-  - ReadWriteOnce
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 10Gi
----
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: redis
   labels:
     app: redis
 spec:
+  serviceName: redis
   replicas: 1
   selector:
     matchLabels:
@@ -91,7 +80,12 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: data
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: redis-volume
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce"]
+      storageClassName: wekafs--sdf-k8s01
+      resources:
+        requests:
+          storage: 10Gi
