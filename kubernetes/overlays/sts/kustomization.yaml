@@ -14,7 +14,7 @@ resources:
 - ns.yaml
 - enqueue-deploy.yaml
 - idle-deploy.yaml
-- ingest-deploy-sts.yaml
+- ingest-deploy.yaml
 - redis-deploy.yaml
 
 secretGenerator:
