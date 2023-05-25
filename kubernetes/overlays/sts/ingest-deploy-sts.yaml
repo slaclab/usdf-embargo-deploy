@@ -63,6 +63,7 @@ spec:
         resources:
           limits:
             cpu: "1"
+            memory: "2Gi"
         volumeMounts:
         - mountPath: /home/lsst/.lsst
           name: secrets
