@@ -69,7 +69,7 @@ spec:
         - name: RUCIO_RSE
           value: USDF_STS_DISK
         - name: RUCIO_DTN
-          value: https://sdfdtn005.slac.stanford.edu:1095/
+          value: davs://sdfdtn005.slac.stanford.edu:1095/
         - name: RUCIO_SCOPE
           value: raw
         resources:
