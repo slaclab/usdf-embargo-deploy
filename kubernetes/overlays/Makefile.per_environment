@@ -9,6 +9,8 @@ get-secrets-from-vault:
 	set -e; for i in db-auth.yaml; do vault kv get --field=$$i secret/rubin/usdf-butler/client-config > etc/.secrets/$$i ; done
 	# s3 creds for data from the summit (s3df ceph bucket)
 	set -e; for i in access_key secret_key; do vault kv get --field=$$i secret/rubin/embargo/read/rubin-summit-users > etc/.secrets/$$i ; done
+	# optional rucio service account ssh key
+	for i in register_svc_rsa; do vault kv get --field=$$i ${SECRET_PATH}/${ENV} > etc/.secrets/$$i || echo ignoring missing $$i ; done
 
 clean-secrets:
 	rm -rf etc/.secrets/

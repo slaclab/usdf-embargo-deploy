@@ -31,3 +31,6 @@ secretGenerator:
 - name: notification
   files:
   - secret=etc/.secrets/notification
+- name: rucio-auth
+  files:
+  - register_svc_rsa=etc/.secrets/register_svc_rsa

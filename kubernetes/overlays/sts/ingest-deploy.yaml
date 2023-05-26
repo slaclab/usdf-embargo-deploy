@@ -26,11 +26,15 @@ spec:
         - "-c"
         - |
           cp -RL /secrets-raw/* /secrets
+          cp -RL /secrets-rucio/* /secrets
           chmod 0400 /secrets/*
         volumeMounts:
         - mountPath: /secrets-raw
           name: db-auth
           readOnly: true
+        - mountPath: /secrets-rucio
+          name: rucio-auth
+          readOnly:: true
         - mountPath: /secrets
           name: secrets
       containers:
@@ -60,6 +64,14 @@ spec:
             secretKeyRef:
               name: s3
               key: s3_key
+        - name: RUCIO_CONFIG
+          value: /rucio/rucio.cfg
+        - name: RUCIO_RSE
+          value: USDF_STS_DISK
+        - name: RUCIO_DTN
+          value: https://sdfdtn005.slac.stanford.edu:1095/
+        - name: RUCIO_SCOPE
+          value: raw
         resources:
           limits:
             cpu: "1"
@@ -67,9 +79,34 @@ spec:
         volumeMounts:
         - mountPath: /home/lsst/.lsst
           name: secrets
+        - mountPath: /rucio
+          name: rucio-cfg
       volumes:
       - name: secrets
         emptyDir: {}
       - name: db-auth
         secret:
           secretName: db-auth
+      - name: rucio-auth
+        secret:
+          secretName: rucio-auth
+      - name: rucio-cfg
+        configMap:
+          name: rucio-cfg
+          items:
+          - key: "rucio.cfg"
+            path: "rucio.cfg"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rucio-cfg
+data:
+  rucio.cfg: |
+    [client]
+    account = register_service
+    auth_host = https://rubin-rucio-dev.slac.stanford.edu:8443
+    auth_type = ssh
+    rucio_host = https://rubin-rucio-dev.slac.stanford.edu:8443
+    ssh_private_key = /home/lsst/.lsst/register_svc_rsa
