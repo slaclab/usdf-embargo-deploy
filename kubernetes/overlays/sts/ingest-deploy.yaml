@@ -106,7 +106,7 @@ data:
   rucio.cfg: |
     [client]
     account = register_service
-    auth_host = https://rubin-rucio-dev.slac.stanford.edu:8443
+    auth_host = https://rubin-rucio.slac.stanford.edu:8443
     auth_type = ssh
-    rucio_host = https://rubin-rucio-dev.slac.stanford.edu:8443
+    rucio_host = https://rubin-rucio.slac.stanford.edu:8443
     ssh_private_key = /home/lsst/.lsst/register_svc_rsa
