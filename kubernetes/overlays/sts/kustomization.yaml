@@ -2,7 +2,7 @@ images:
 - name: ghcr.io/lsst-dm/embargo-butler-enqueue
   newTag: "0.91"
 - name: ghcr.io/lsst-dm/embargo-butler-ingest
-  newTag: "0.91"
+  newTag: "0.92"
 - name: ghcr.io/lsst-dm/embargo-butler-idle
   newTag: "0.91"
 - name: docker.io/redis
