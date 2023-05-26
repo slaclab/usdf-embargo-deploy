@@ -1,7 +1,7 @@
 {
   "Version": "2012-10-17",
   "Statement": [{
-    "Sid": "allow-rubin-summit-users-write-rubin-tts-users",
+    "Sid": "bts-users-policy",
     "Effect": "Allow",
     "Principal": {"AWS": ["arn:aws:iam:::user/rubin-summit-users"]},
     "Action": [
@@ -15,8 +15,8 @@
       "s3:PutObject"
     ],
     "Resource": [
-      "arn:aws:s3:::rubin-tts-users",
-      "arn:aws:s3:::rubin-tts-users/*"
+      "arn:aws:s3:::rubin-bts-users",
+      "arn:aws:s3:::rubin-bts-users/*"
     ]
   }]
 }

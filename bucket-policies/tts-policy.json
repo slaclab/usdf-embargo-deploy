@@ -1,7 +1,7 @@
 {
   "Version": "2012-10-17",
   "Statement": [{
-    "Sid": "allow-rubin-summit-users-read-rubin-bts",
+    "Sid": "tts-policy",
     "Effect": "Allow",
     "Principal": {"AWS": ["arn:aws:iam:::user/rubin-summit-users"]},
     "Action": [
@@ -12,8 +12,8 @@
       "s3:ListBucketVersions"
     ],
     "Resource": [
-      "arn:aws:s3:::rubin-bts",
-      "arn:aws:s3:::rubin-bts/*"
+      "arn:aws:s3:::rubin-tts",
+      "arn:aws:s3:::rubin-tts/*"
     ]
   }]
 }
