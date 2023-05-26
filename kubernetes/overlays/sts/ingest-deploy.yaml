@@ -34,7 +34,7 @@ spec:
           readOnly: true
         - mountPath: /secrets-rucio
           name: rucio-auth
-          readOnly:: true
+          readOnly: true
         - mountPath: /secrets
           name: secrets
       containers:
