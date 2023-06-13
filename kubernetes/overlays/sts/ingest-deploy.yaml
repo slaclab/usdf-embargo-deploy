@@ -72,6 +72,8 @@ spec:
           value: davs://sdfdtn005.slac.stanford.edu:1095/
         - name: RUCIO_SCOPE
           value: raw
+        - name: WEBHOOK_URI
+          value: https://lsst-camera-dev.slac.stanford.edu/FITSInfo/rest/webhook/update
         resources:
           limits:
             cpu: "1"
