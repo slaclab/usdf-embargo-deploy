@@ -101,5 +101,5 @@ Note that these changes only persist until the next ``make apply``.
 1. Update the ``kustomization.yaml`` to select that tag for the environments and pods where it is needed.
 1. Apply and ensure that the deployment is correct in the dev cluster.
    ``/sdf/home/k/ktl/ingest_trigger/trigger_ingest.py`` may be of use in testing.
-1. Commit and merge the deployment update.
+1. Commit and merge the deployment update.  Note that PRs need to be manually set to go against the ``slaclab`` repo ``main`` branch, since it is a fork.
 1. Apply and ensure that the deployment is correct in the prod cluster.
