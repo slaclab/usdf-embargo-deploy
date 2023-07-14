@@ -38,6 +38,51 @@ where the PROFILE specifies the credentials for the bucket owner.
 
 The bucket policies should only need to be set once, but they may change over time.
 
+# Bucket Notifications
+
+Setting up bucket notifications in S3 (including Ceph) requires two things: creating a notification topic and configuring the bucket to notify on that topic.
+
+Creating a topic uses parameters specified in the [Ceph Bucket Notifications documentation](https://docs.ceph.com/en/latest/radosgw/notifications/#create-a-topic).
+For a Kakfa or webhook topic, make sure to specify ``push-endpoint`` as a URI.
+The auto-ingest system expects ``persistent=true`` in order to allow Ceph to return status as soon as an object is created, without waiting for the notification.
+The auto-ingest system also expects webhooks to have an ``OpaqueData`` item which matches the ``notification`` secret in ``vault.slac.stanford.edu``.
+Sample command:
+```
+alias sns='singularity exec /sdf/sw/s3/aws-cli_latest.sif aws --endpoint-url https://s3dfrgw.slac.stanford.edu sns --region=""'
+sns create-topic --name=rubin-summit --attributes='{"push-endpoint": "http://172.24.5.174:8080/notify", "OpaqueData": "GETFROMVAULT", "persistent": "true" }'
+```
+Each topic is assigned an "ARN" by Ceph with its name as the last component for future reference.
+
+Next, one or more notifications need to be configured for the bucket.
+Each one links bucket events with topics via the ARN.
+Sample JSON:
+```
+{
+    "TopicConfigurations": [
+        {
+            "Id": "rubin-prompt-processing-prod",
+            "TopicArn": "arn:aws:sns:default::rubin-prompt-processing-prod",
+            "Events": [
+                "s3:ObjectCreated:*"
+            ]
+        },
+        {
+            "Id": "rubin-summit-to-http",
+            "TopicArn": "arn:aws:sns:default::rubin-summit",
+            "Events": [
+                "s3:ObjectCreated:*"
+            ]
+        }
+    ]
+}
+```
+Sample command:
+```
+s3api --profile=wsummit put-bucket-notification-configuration --bucket=rubin-summit --notification-configuration=file:///path/to/my/config.json
+```
+
+Note that changing a topic's attributes does not take effect until the bucket notification configurations are rewritten, even if they're updated with the exact same JSON.
+
 # Deployment Structure
 
 The ingest services are comprised of a Redis pod, a single "enqueue" pod, a single "idle" cleanup pod, and a set of one or more "ingest" pods.
