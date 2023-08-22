@@ -28,6 +28,10 @@ secretGenerator:
 - name: db-auth
   files:
   - db-auth.yaml=etc/.secrets/db-auth.yaml
+- name: db-env
+  files:
+  - pg_password=etc/.secrets/pg_password
+  - pg_user=etc/.secrets/pg_user
 - name: notification
   files:
   - secret=etc/.secrets/notification
