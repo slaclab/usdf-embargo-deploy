@@ -88,9 +88,11 @@ spec:
             - name: sdf-group-rubin
               persistentVolumeClaim:
                 claimName: sdf-group-rubin
+                storageClassName: sdf-group-rubin
             - name: sdf-data-rubin
               persistentVolumeClaim:
                 claimName: sdf-data-rubin
+                storageClassName: sdf-data-rubin
           restartPolicy: OnFailure
 
 
