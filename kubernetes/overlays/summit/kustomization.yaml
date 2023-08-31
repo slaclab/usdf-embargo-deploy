@@ -7,15 +7,18 @@ images:
   newTag: "0.98"
 - name: docker.io/redis
   newTag: "7.0.8"
+- name: ghcr.io/lsst-dm/transfer-embargo
+  newTag: "latest"
 
 namespace: summit
 
 resources:
 - ns.yaml
-- enqueue-deploy.yaml
-- idle-deploy.yaml
-- ingest-deploy.yaml
-- redis-deploy.yaml
+# - enqueue-deploy.yaml
+# - idle-deploy.yaml
+# - ingest-deploy.yaml
+# - redis-deploy.yaml
+- transfer-embargo-deploy.yaml
 
 secretGenerator:
 - name: s3
