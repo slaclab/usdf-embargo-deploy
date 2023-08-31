@@ -34,7 +34,7 @@ secretGenerator:
 - name: db-env
   files:
   - pg_password=etc/.secrets/pg_password
-  - pg_user=etc/.secrets/pg_user
+  - pg_username=etc/.secrets/pg_user
 # - name: notification
 #   files:
 #   - secret=etc/.secrets/notification
