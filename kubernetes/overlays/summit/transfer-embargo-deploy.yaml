@@ -29,7 +29,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: transfer-embargo-temp
-  namespace: devel-transfer-embargo
+  namespace: summit
 spec:
   schedule: "* * * * *"
   jobTemplate:
@@ -66,7 +66,7 @@ spec:
                 valueFrom:
                     secretKeyRef:
                       name: db-env
-                      key: pg_user
+                      key: pg_username
               # - name: S3_ENDPOINT_URL
               #   value: http://s3dfrgw.slac.stanford.edu
               # - name: AWS_ACCESS_KEY_ID
