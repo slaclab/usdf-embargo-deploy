@@ -3,7 +3,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: sdf-group-rubin
-  namespace: devel-transfer-embargo
+  # namespace: devel-transfer-embargo
 spec:
   storageClassName: sdf-group-rubin
   accessModes:
@@ -16,7 +16,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: sdf-data-rubin
-  namespace: devel-transfer-embargo
+  # namespace: devel-transfer-embargo
 spec:
   storageClassName: sdf-data-rubin
   accessModes:
@@ -88,11 +88,11 @@ spec:
             - name: sdf-group-rubin
               persistentVolumeClaim:
                 claimName: sdf-group-rubin
-                storageClassName: sdf-group-rubin
+                # storageClassName: sdf-group-rubin
             - name: sdf-data-rubin
               persistentVolumeClaim:
                 claimName: sdf-data-rubin
-                storageClassName: sdf-data-rubin
+                # storageClassName: sdf-data-rubin
           restartPolicy: OnFailure
 
 
