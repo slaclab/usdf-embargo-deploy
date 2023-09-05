@@ -29,7 +29,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: transfer-embargo-temp
-  namespace: summit
+#  namespace: summit
 spec:
   schedule: "* * * * *"
   jobTemplate:
@@ -42,19 +42,19 @@ spec:
               imagePullPolicy: Always
               env:
               - name: FROMREPO
-                value: "./tests_docker/temp_from"
+                value: "/sdf/group/rubin/repo/embargo"
               - name: TOREPO
                 value: "./tests_docker/temp_to"
               - name: INSTRUMENT
                 value: "LATISS"
               - name: EMBARGO_HRS
-                value: "1063"
+                value: "1063.0801881391666666666666666666666666666666666666666666666666666"
               # - name: datasettype
               #   value: "raw"
               # - name: collection
               #   value: "LATISS/raw/all"
               - name: NOW
-                value: "2020-03-01 23:59:59.999999"
+                value: "2020-03-02 00:00:00.000000"
               - name: MOVE
                 value: "False"
               - name: PGPASSWORD
