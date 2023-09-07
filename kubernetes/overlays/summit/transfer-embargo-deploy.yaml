@@ -44,11 +44,11 @@ spec:
               - name: FROMREPO
                 value: "/sdf/group/rubin/repo/embargo"
               - name: TOREPO
-                value: "./tests_docker/temp_to"
+                value: "/sdf/home/j/jarugula/DM-37690/transfer_embargo/tests_docker/temp-to"
               - name: INSTRUMENT
                 value: "LATISS"
               - name: EMBARGO_HRS
-                value: "1063.0801881391666666666666666666666666666666666666666666666666666"
+                value: "1063.080188139167"
               # - name: datasettype
               #   value: "raw"
               # - name: collection
@@ -67,18 +67,18 @@ spec:
                     secretKeyRef:
                       name: db-env
                       key: pg_username
-              # - name: S3_ENDPOINT_URL
-              #   value: http://s3dfrgw.slac.stanford.edu
-              # - name: AWS_ACCESS_KEY_ID
-              #   valueFrom:
-              #     secretKeyRef:
-              #       name: s3
-              #       key: s3_access
-              # - name: AWS_SECRET_ACCESS_KEY
-              #   valueFrom:
-              #     secretKeyRef:
-              #       name: s3
-              #       key: s3_key
+              - name: S3_ENDPOINT_URL
+                value: http://s3dfrgw.slac.stanford.edu
+              - name: AWS_ACCESS_KEY_ID
+                valueFrom:
+                  secretKeyRef:
+                    name: s3
+                    key: s3_access
+              - name: AWS_SECRET_ACCESS_KEY
+                valueFrom:
+                  secretKeyRef:
+                    name: s3
+                    key: s3_key
               volumeMounts:
                 - name: sdf-group-rubin
                   mountPath: /sdf/group/rubin

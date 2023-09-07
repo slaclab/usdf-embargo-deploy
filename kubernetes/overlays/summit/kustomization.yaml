@@ -21,10 +21,10 @@ resources:
 - transfer-embargo-deploy.yaml
 
 secretGenerator:
-# - name: s3
-#   files:
-#   - s3_access=etc/.secrets/access_key
-#   - s3_key=etc/.secrets/secret_key
+- name: s3
+  files:
+  - s3_access=etc/.secrets/access_key
+  - s3_key=etc/.secrets/secret_key
 # - name: redis
 #   files:
 #   - redis-password=etc/.secrets/redis
