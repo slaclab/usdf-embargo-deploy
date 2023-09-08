@@ -40,7 +40,7 @@ spec:
       - name: FROMREPO
         value: "s3://rubin-summit-users/butler.yaml"
       - name: TOREPO
-        value: "/sdf/home/j/jarugula/DM-37690/transfer_embargo/tests_docker/temp-to"
+        value: "tests_docker/temp_to"
       - name: INSTRUMENT
         value: "LATISS"
       - name: EMBARGO_HRS
@@ -64,7 +64,7 @@ spec:
               name: db-env
               key: pg_username
       - name: S3_ENDPOINT_URL
-        value: http://s3dfrgw.slac.stanford.edu
+        value: https://s3dfrgw.slac.stanford.edu
       - name: AWS_ACCESS_KEY_ID
         valueFrom:
           secretKeyRef:
