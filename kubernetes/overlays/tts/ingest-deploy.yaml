@@ -44,7 +44,7 @@ spec:
         - name: BUCKET
           value: rubin-tts
         - name: BUTLER_REPO
-          value: /repo/tts
+          value: s3://rubin-tts-users/butler.yaml
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
