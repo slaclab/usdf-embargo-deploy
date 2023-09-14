@@ -40,17 +40,17 @@ spec:
       - name: FROMREPO
         value: "s3://rubin-summit-users/butler.yaml"
       - name: TOREPO
-        value: "tests_docker/temp_to"
+        value: "/sdf/data/rubin/user/jarugula/temp_butler/temp_to_test"
       - name: INSTRUMENT
         value: "LATISS"
       - name: EMBARGO_HRS
-        value: "1063.080188139167"
+        value: "0.1"
       # - name: datasettype
       #   value: "raw"
       # - name: collection
       #   value: "LATISS/raw/all"
       - name: NOW
-        value: "2020-03-02 00:00:00.000000"
+        value: "2022-09-01 21:46:50.272000"
       - name: MOVE
         value: "False"
       - name: PGPASSWORD
