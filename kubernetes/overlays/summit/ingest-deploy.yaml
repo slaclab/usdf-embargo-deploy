@@ -44,7 +44,7 @@ spec:
         - name: BUCKET
           value: rubin-summit
         - name: BUTLER_REPO
-          value: /repo/embargo
+          value: s3://rubin-summit-users/butler.yaml
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:

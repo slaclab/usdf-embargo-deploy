@@ -48,7 +48,7 @@ spec:
         - name: BUCKET
           value: rubin-sts
         - name: BUTLER_REPO
-          value: /repo/ir2
+          value: s3://rubin-sts/butler.yaml
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
