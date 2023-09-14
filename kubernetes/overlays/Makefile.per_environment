@@ -8,7 +8,7 @@ get-secrets-from-vault:
 	# butler dbauth.yaml file with creds
 	set -e; for i in db-auth.yaml; do vault kv get --field=$$i secret/rubin/usdf-butler/client-config > etc/.secrets/$$i ; done
 	# butler Postgres creds
-	set -e; for i in password user; do vault kv get --field=$$i secret/rubin/usdf-butler/postgres > etc/.secrets/pg_$$i ; done
+	set -e; for i in password username; do vault kv get --field=$$i secret/rubin/usdf-butler/postgres > etc/.secrets/pg_$$i ; done
 	# s3 creds for data from the summit (s3df ceph bucket)
 	set -e; for i in access_key secret_key; do vault kv get --field=$$i secret/rubin/embargo/read/rubin-summit-users > etc/.secrets/$$i ; done
 	# optional rucio service account ssh key
