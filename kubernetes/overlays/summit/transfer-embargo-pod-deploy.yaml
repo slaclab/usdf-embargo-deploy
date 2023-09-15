@@ -53,6 +53,8 @@ spec:
         value: "2022-09-01 21:46:50.272000"
       - name: MOVE
         value: "False"
+      - name: LOG
+        value: "True"
       - name: PGPASSWORD
         valueFrom:
             secretKeyRef:
