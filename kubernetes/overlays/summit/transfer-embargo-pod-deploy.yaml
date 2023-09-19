@@ -32,65 +32,69 @@ metadata:
   name: transfer-embargo-temp
 #  namespace: summit
 spec:
-    containers:
-    - name: transfer-embargo-container
-      image: "ghcr.io/lsst-dm/transfer-embargo:latest"
-      imagePullPolicy: Always
-      env:
-      - name: FROMREPO
-        value: "s3://rubin-summit-users/butler.yaml"
-      - name: TOREPO
-        value: "/sdf/data/rubin/user/jarugula/temp_butler/temp_to_test"
-      - name: INSTRUMENT
-        value: "LATISS"
-      - name: EMBARGO_HRS
-        value: "0.1"
-      # - name: datasettype
-      #   value: "raw"
-      # - name: collection
-      #   value: "LATISS/raw/all"
-      - name: NOW
-        value: "2022-09-01 21:46:50.272000"
-      - name: MOVE
-        value: "False"
-      - name: LOG
-        value: "True"
-      - name: PGPASSWORD
-        valueFrom:
-            secretKeyRef:
-              name: db-env
-              key: pg_password
-      - name: PGUSER
-        valueFrom:
-            secretKeyRef:
-              name: db-env
-              key: pg_username
-      - name: S3_ENDPOINT_URL
-        value: https://s3dfrgw.slac.stanford.edu
-      - name: AWS_ACCESS_KEY_ID
-        valueFrom:
+  securityContext:
+    runAsUser: 18296
+    runAsGroup: 4085
+  containers:
+  - name: transfer-embargo-container
+    image: "ghcr.io/lsst-dm/transfer-embargo:latest"
+    imagePullPolicy: Always
+    env:
+    - name: FROMREPO
+      value: "s3://rubin-summit-users/butler.yaml"
+    - name: TOREPO
+      value: "/sdf/group/rubin/repo/prompt"
+   #  value: "/sdf/data/rubin/user/jarugula/temp_butler/temp_to_test"
+    - name: INSTRUMENT
+      value: "LATISS"
+    - name: EMBARGO_HRS
+      value: "0.1"
+    # - name: datasettype
+    #   value: "raw"
+    # - name: collection
+    #   value: "LATISS/raw/all"
+    - name: NOW
+      value: "2022-09-01 21:46:50.272000"
+    - name: MOVE
+      value: "False"
+    - name: LOG
+      value: "True"
+    - name: PGPASSWORD
+      valueFrom:
           secretKeyRef:
-            name: s3
-            key: s3_access
-      - name: AWS_SECRET_ACCESS_KEY
-        valueFrom:
+            name: db-env
+            key: pg_password
+    - name: PGUSER
+      valueFrom:
           secretKeyRef:
-            name: s3
-            key: s3_key
-      volumeMounts:
-        - name: sdf-group-rubin
-          mountPath: /sdf/group/rubin
-        - name: sdf-data-rubin
-          mountPath: /sdf/data/rubin
-    volumes:
-    - name: sdf-group-rubin
-      persistentVolumeClaim:
-        claimName: sdf-group-rubin
-        # storageClassName: sdf-group-rubin
-    - name: sdf-data-rubin
-      persistentVolumeClaim:
-        claimName: sdf-data-rubin
-        # storageClassName: sdf-data-rubin
-    restartPolicy: OnFailure
+            name: db-env
+            key: pg_username
+    - name: S3_ENDPOINT_URL
+      value: https://s3dfrgw.slac.stanford.edu
+    - name: AWS_ACCESS_KEY_ID
+      valueFrom:
+        secretKeyRef:
+          name: s3
+          key: s3_access
+    - name: AWS_SECRET_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          name: s3
+          key: s3_key
+    volumeMounts:
+      - name: sdf-group-rubin
+        mountPath: /sdf/group/rubin
+      - name: sdf-data-rubin
+        mountPath: /sdf/data/rubin
+  volumes:
+  - name: sdf-group-rubin
+    persistentVolumeClaim:
+      claimName: sdf-group-rubin
+      # storageClassName: sdf-group-rubin
+  - name: sdf-data-rubin
+    persistentVolumeClaim:
+      claimName: sdf-data-rubin
+      # storageClassName: sdf-data-rubin
+  restartPolicy: OnFailure
 
 
