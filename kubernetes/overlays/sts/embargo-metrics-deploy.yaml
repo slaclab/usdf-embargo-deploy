@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embargo-metrics
+  labels:
+    app: metrics
+    site: sts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metrics
+      site: sts
+  template:
+    metadata:
+      labels:
+        app: metrics
+        site: sts
+    spec:
+      containers:
+      - name: metrics
+        image: "ghcr.io/lsst-dm/embargo-butler-ingest:prod"
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis
+              key: redis-password
+        resources:
+          limits:
+            cpu: "1"
+            memory: "2Gi"
