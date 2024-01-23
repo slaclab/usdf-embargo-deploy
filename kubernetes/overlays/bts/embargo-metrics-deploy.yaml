@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sts-embargo-metrics
+  name: bts-embargo-metrics
   labels:
     app: metrics
-    site: sts
+    site: bts
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: metrics
-      site: sts
+      site: bts
   template:
     metadata:
       labels:
         app: metrics
-        site: sts
+        site: bts
     spec:
       containers:
       - name: metrics
