@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: metrics
-        image: "ghcr.io/lsst-dm/embargo-butler-ingest:prod"
+        image: "image: ghcr.io/slaclab/rubin-embargo-metrics:latest"
         env:
         - name: REDIS_PASSWORD
           valueFrom:
