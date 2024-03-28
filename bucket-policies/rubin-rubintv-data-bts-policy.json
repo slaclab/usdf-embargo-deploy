@@ -1,0 +1,25 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "allow-read-rubintv-data-ro",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": [
+          "arn:aws:iam:::user/rubin-rubintv-data-ro"
+        ]
+      },
+      "Action": [
+        "s3:GetBucketLocation",
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:ListBucket",
+        "s3:ListBucketVersions"
+      ],
+      "Resource": [
+        "arn:aws:s3:::rubin-rubintv-data-bts",
+        "arn:aws:s3:::rubin-rubintv-data-bts/*"
+      ]
+    }
+  ]
+}
