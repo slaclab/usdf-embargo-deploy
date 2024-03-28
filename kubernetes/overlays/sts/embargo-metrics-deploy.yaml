@@ -27,6 +27,8 @@ spec:
             secretKeyRef:
               name: redis
               key: redis-password
+        - name: REDIS_URL
+          value: redis://redis:6379
         resources:
           limits:
             cpu: "1"
