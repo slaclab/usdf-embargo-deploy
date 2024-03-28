@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Sid": "allow-read-write-rubin-summit-users",
+    "Effect": "Allow",
+    "Principal": {
+      "AWS": [
+        "arn:aws:iam:::user/prompt-processing-dev"
+      ]
+    },
+    "Action": [
+      "s3:*"
+    ],
+    "Resource": [
+      "arn:aws:s3:::rubin-summit-users",
+      "arn:aws:s3:::rubin-summit-users/*"
+    ]
+  }]
+}
+
