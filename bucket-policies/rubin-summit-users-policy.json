@@ -1,7 +1,7 @@
 {
   "Version": "2012-10-17",
   "Statement": [{
-    "Sid": "allow-read-write-rubin-summit-users",
+    "Sid": "allow-prompt-processing-read-write-rubin-summit-users",
     "Effect": "Allow",
     "Principal": {
       "AWS": [
@@ -9,7 +9,14 @@
       ]
     },
     "Action": [
-      "s3:*"
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion",
+      "s3:GetBucketLocation",
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:ListBucket",
+      "s3:ListBucketVersions",
+      "s3:PutObject"
     ],
     "Resource": [
       "arn:aws:s3:::rubin-summit-users",
