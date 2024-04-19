@@ -81,6 +81,8 @@ Sample command:
 s3api --profile=wsummit put-bucket-notification-configuration --bucket=rubin-summit --notification-configuration=file:///path/to/my/config.json
 ```
 
+The file path must be visible to the apptainer container, which usually means that it must be under ``/sdf/home`` (and not symlinked from ``/sdf/data``).
+
 Note that changing a topic's attributes does not take effect until the bucket notification configurations are rewritten, even if they're updated with the exact same JSON.
 
 # Deployment Structure
