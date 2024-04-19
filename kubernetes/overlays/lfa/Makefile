@@ -1,0 +1,30 @@
+SECRET_PATH ?= secret/rubin/usdf-embargo-dmz
+ENV = $(notdir ${CURDIR})
+
+get-secrets-from-vault:
+	mkdir -p etc/.secrets/
+	# internal redis password and Ceph notification secret
+	set -e; for i in redis notification; do vault kv get --field=$$i ${SECRET_PATH}/${ENV} > etc/.secrets/$$i ; done
+	# butler dbauth.yaml file with creds
+	set -e; for i in db-auth.yaml; do vault kv get --field=$$i secret/rubin/usdf-butler/client-config > etc/.secrets/$$i ; done
+	# butler Postgres creds
+	set -e; for i in password username; do vault kv get --field=$$i secret/rubin/usdf-butler/postgres > etc/.secrets/pg_$$i ; done
+	# s3 creds for data from the summit (s3df ceph bucket)
+	set -e; for i in access_key secret_key; do vault kv get --field=$$i ${SECRET_PATH}/${ENV}> etc/.secrets/$$i ; done
+	# optional rucio service account ssh key
+	for i in register_svc_rsa; do vault kv get --field=$$i ${SECRET_PATH}/${ENV} > etc/.secrets/$$i || echo ignoring missing $$i ; done
+
+clean-secrets:
+	rm -rf etc/.secrets/
+
+run-dump:
+	kubectl kustomize .
+
+dump: get-secrets-from-vault run-dump clean-secrets
+
+run-apply:
+	kubectl apply -k .
+
+apply: get-secrets-from-vault run-apply clean-secrets
+
+
