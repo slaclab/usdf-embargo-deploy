@@ -20,6 +20,7 @@ resources:
 # - redis-deploy.yaml
 # - transfer-embargo-deploy.yaml
 - transfer-embargo-pod-deploy.yaml
+- etc/transfer-config.cfg
 
 secretGenerator:
 - name: s3
