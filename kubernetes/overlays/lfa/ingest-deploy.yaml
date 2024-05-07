@@ -1,0 +1,109 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embargo-butler-ingest-lfa
+  labels:
+    app: ingest-lfa
+    site: summit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ingest-lfa
+      site: summit
+  template:
+    metadata:
+      labels:
+        app: ingest-lfa
+        site: summit
+    spec:
+      initContainers:
+      - name: "fix-secret-permissions"
+        image: "ghcr.io/lsst-dm/embargo-butler-ingest:prod"
+        command:
+        - "/bin/bash"
+        - "-c"
+        - |
+          cp -RL /secrets-raw/* /secrets
+          chmod 0400 /secrets/*
+        volumeMounts:
+        - mountPath: /secrets-raw
+          name: db-auth
+          readOnly: true
+        - mountPath: /secrets
+          name: secrets
+      containers:
+      - name: ingest
+        image: "ghcr.io/lsst-dm/embargo-butler-ingest:prod"
+        env:
+        - name: S3_ENDPOINT_URL
+          value: https://s3dfrgw.slac.stanford.edu
+        - name: REDIS_HOST
+          value: redis
+        - name: BUCKET
+          value: rubinobs-lfa-cp
+        - name: BUTLER_REPO
+          value: /sdf/group/rubin/repo/main
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis
+              key: redis-password
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: s3
+              key: s3_access
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: s3
+              key: s3_key
+        resources:
+          limits:
+            cpu: 500m
+            memory: "1Gi"
+        volumeMounts:
+        - mountPath: /home/lsst/.lsst
+          name: secrets
+        - mountPath: "/sdf/data/rubin"
+          name: "sdf-data-rubin"
+        - mountPath: "/sdf/group/rubin"
+          name: "sdf-group-rubin"
+      volumes:
+      - name: secrets
+        emptyDir: {}
+      - name: db-auth
+        secret:
+          secretName: db-auth
+      - name: "sdf-data-rubin"
+        persistentVolumeClaim:
+          claimName: "sdf-data-rubin"
+      - name: "sdf-group-rubin"
+        persistentVolumeClaim:
+          claimName: "sdf-group-rubin"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "sdf-data-rubin"
+spec:
+  storageClassName: "sdf-data-rubin"
+  accessModes:
+  - "ReadWriteMany"
+  resources:
+    requests:
+      storage: "1Gi"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "sdf-group-rubin"
+spec:
+  storageClassName: "sdf-group-rubin"
+  accessModes:
+  - "ReadWriteMany"
+  resources:
+    requests:
+      storage: "1Gi"

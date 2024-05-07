@@ -1,0 +1,37 @@
+images:
+- name: ghcr.io/lsst-dm/embargo-butler-enqueue
+  newTag: "1.0"
+- name: ghcr.io/lsst-dm/embargo-butler-ingest
+  newTag: "1.0-w_2024_16"
+- name: ghcr.io/lsst-dm/embargo-butler-idle
+  newTag: "1.0"
+- name: docker.io/redis
+  newTag: "7.0.15"
+
+namespace: lfa
+
+resources:
+- ns.yaml
+- enqueue-deploy.yaml
+- idle-deploy.yaml
+- ingest-deploy.yaml
+- redis-deploy.yaml
+
+secretGenerator:
+- name: s3
+  files:
+  - s3_access=etc/.secrets/access_key
+  - s3_key=etc/.secrets/secret_key
+- name: redis
+  files:
+  - redis-password=etc/.secrets/redis
+- name: db-auth
+  files:
+  - db-auth.yaml=etc/.secrets/db-auth.yaml
+- name: db-env
+  files:
+  - pg_password=etc/.secrets/pg_password
+  - pg_user=etc/.secrets/pg_username
+- name: notification
+  files:
+  - secret=etc/.secrets/notification
