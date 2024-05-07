@@ -1,12 +1,12 @@
 images:
 - name: ghcr.io/lsst-dm/embargo-butler-enqueue
-  newTag: "0.99"
+  newTag: "1.0"
 - name: ghcr.io/lsst-dm/embargo-butler-ingest
-  newTag: "0.99.2-w_2023_41"
+  newTag: "1.0-d_2024_05_07"
 - name: ghcr.io/lsst-dm/embargo-butler-idle
-  newTag: "0.99"
+  newTag: "1.0"
 - name: docker.io/redis
-  newTag: "7.0.8"
+  newTag: "7.0.15"
 
 namespace: bts
 
