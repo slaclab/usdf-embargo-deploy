@@ -1,10 +1,12 @@
 images:
 - name: ghcr.io/lsst-dm/embargo-butler-enqueue
-  newTag: "1.0"
+  newTag: "1.1"
 - name: ghcr.io/lsst-dm/embargo-butler-ingest
-  newTag: "1.0-d_2024_05_07"
+  newTag: "1.1"
 - name: ghcr.io/lsst-dm/embargo-butler-idle
-  newTag: "1.0"
+  newTag: "1.1"
+- name: ghcr.io/lsst-dm/embargo-butler-presence
+  newTag: "1.1"
 - name: docker.io/redis
   newTag: "7.0.15"
 
@@ -15,6 +17,7 @@ resources:
 - enqueue-deploy.yaml
 - idle-deploy.yaml
 - ingest-deploy.yaml
+- presence-deploy.yaml
 - redis-deploy.yaml
 
 secretGenerator:
