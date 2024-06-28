@@ -10,7 +10,7 @@ images:
 - name: docker.io/redis
   newTag: "7.0.15"
 
-namespace: summit
+namespace: summit-new
 
 resources:
 - ns.yaml
@@ -23,18 +23,13 @@ resources:
 secretGenerator:
 - name: s3
   files:
-  - s3_access=etc/.secrets/access_key
-  - s3_key=etc/.secrets/secret_key
+  - profile=etc/.secrets/profile
 - name: redis
   files:
   - redis-password=etc/.secrets/redis
 - name: db-auth
   files:
   - db-auth.yaml=etc/.secrets/db-auth.yaml
-- name: db-env
-  files:
-  - pg_password=etc/.secrets/pg_password
-  - pg_user=etc/.secrets/pg_username
 - name: notification
   files:
   - secret=etc/.secrets/notification

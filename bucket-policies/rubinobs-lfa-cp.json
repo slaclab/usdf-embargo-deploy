@@ -1,0 +1,11 @@
+{
+    "TopicConfigurations": [
+        {
+            "Id": "rubinobs-lfa-cp-to-http",
+            "TopicArn": "arn:aws:sns:default:rubin:rubinobs-lfa-cp",
+            "Events": [
+                "s3:ObjectCreated:*"
+            ]
+        }
+    ]
+}

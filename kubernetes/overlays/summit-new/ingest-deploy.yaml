@@ -1,0 +1,69 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embargo-butler-ingest
+  labels:
+    app: ingest
+    site: summit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ingest
+      site: summit
+  template:
+    metadata:
+      labels:
+        app: ingest
+        site: summit
+    spec:
+      initContainers:
+      - name: "fix-secret-permissions"
+        image: "ghcr.io/lsst-dm/embargo-butler-ingest:prod"
+        command:
+        - "/bin/bash"
+        - "-c"
+        - |
+          cp -RL /secrets-raw/* /secrets
+          chmod 0400 /secrets/*
+        volumeMounts:
+        - mountPath: /secrets-raw
+          name: db-auth
+          readOnly: true
+        - mountPath: /secrets
+          name: secrets
+      containers:
+      - name: ingest
+        image: "ghcr.io/lsst-dm/embargo-butler-ingest:prod"
+        imagePullPolicy: Always
+        env:
+        - name: LSST_RESOURCES_S3_PROFILE_embargo
+          valueFrom: 
+            secretKeyRef:
+              name: s3
+              key: profile
+        - name: REDIS_HOST
+          value: redis
+        - name: BUCKET
+          value: embargo@rubin-summit
+        - name: BUTLER_REPO
+          value: s3://embargo@rubin-summit-users/butler.yaml
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis
+              key: redis-password
+        resources:
+          limits:
+            cpu: "1"
+            memory: "2Gi"
+        volumeMounts:
+        - mountPath: /home/lsst/.lsst
+          name: secrets
+      volumes:
+      - name: secrets
+        emptyDir: {}
+      - name: db-auth
+        secret:
+          secretName: db-auth
