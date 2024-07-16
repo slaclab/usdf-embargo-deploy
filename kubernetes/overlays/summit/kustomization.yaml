@@ -8,7 +8,7 @@ images:
 - name: docker.io/redis
   newTag: "7.0.8"
 - name: ghcr.io/lsst-dm/transfer-embargo
-  newTag: "latest"
+  newTag: "dm-41033"
 
 namespace: summit
 
@@ -19,8 +19,19 @@ resources:
 # - ingest-deploy.yaml
 # - redis-deploy.yaml
 # - transfer-embargo-deploy.yaml
-- transfer-embargo-pod-deploy.yaml
-- etc/transfer-config.cfg
+- transfer-embargo-pod-cli-single-deploy.yaml
+
+#configMapGenerator:
+#- name: transfer-config
+#  files:
+#  - etc/config/transfer.yml
+
+#configMapGenerator:
+#- name: transfer-config
+#  literals:
+#  - DATASETTYPE=raw,calexp
+#  - COLLECTIONS=LATISS/raw/all,LATISS/runs/AUXTEL_DRP_IMAGING_2022-11A/w_2022_46/PREOPS-1616
+
 
 secretGenerator:
 - name: s3
