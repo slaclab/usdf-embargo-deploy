@@ -20,11 +20,8 @@ resources:
 # - redis-deploy.yaml
 # - transfer-embargo-deploy.yaml
 - transfer-embargo-pod-cli-single-deploy.yaml
+# - transfer-embargo-pod-from-config-deploy.yaml
 
-#configMapGenerator:
-#- name: transfer-config
-#  files:
-#  - etc/config/transfer.yml
 
 #configMapGenerator:
 #- name: transfer-config

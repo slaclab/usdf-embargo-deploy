@@ -39,13 +39,13 @@ spec:
     runAsGroup: 4085
   containers:
   - name: transfer-embargo-container
-    image: "ghcr.io/lsst-dm/transfer-embargo:dm-41033"
+    image: "ghcr.io/lsst-dm/transfer-embargo:dm-45476"
     imagePullPolicy: Always
     env:
     - name: FROMREPO
       value: "s3://rubin-summit-users/butler.yaml"
     - name: TOREPO
-      value: "/sdf/data/rubin/users/rnevin/scratch"
+      value: "/sdf/data/rubin/user/rnevin/scratch"
     #  value: "s3://lsst/users/rnevin/scratch"
     #  value: "/sdf/home/r/rnevin/scratch"
     #  value: "/sdf/data/rubin/user/rnevin/scratch"
@@ -60,7 +60,7 @@ spec:
     - name: LOG
       value: "True"
     - name: PASTEMBARGO
-      value: "100.0"
+      value: "50.0"
     - name: DATAQUERIES
     #  value: '{ "datasettype": "raw", "collections": "LATISS/raw/all"}'
       value: '{ "datasettype": ["raw"], "collections": ["LATISS/raw/all"]}'
