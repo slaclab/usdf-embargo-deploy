@@ -39,8 +39,19 @@ spec:
     runAsGroup: 4085
   containers:
   - name: transfer-embargo-container
-    image: "ghcr.io/lsst-dm/transfer-embargo:dm-45476"
+    image: "ghcr.io/lsst-dm/transfer-embargo:latest"
     imagePullPolicy: Always
+    command: [ "/bin/bash", "-c", "chmod +x /opt/lsst/software/stack/loadLSST.bash && source /opt/lsst/software/stack/loadLSST.bash && exec /bin/bash" ]
+    #command: [ "/bin/bash", "-c", ". /opt/lsst/software/stack/loadLSST.bash && exec /bin/bash" ]
+    # Unknown shell: command: [ "/bin/bash", "-c", "source /opt/lsst/software/stack/loadLSST.bash && exec /bin/bash" ]
+    # works: command: [ "/bin/bash", "-c", "echo 'Bash is working!'" ]
+    # Unknown shell error: command: [ "bash", "-c", "source \"/opt/lsst/software/stack/loadLSST.bash\"" ]
+    # Unknown shell error: command: [ "/bin/sh", "-c", "source /opt/lsst/software/stack/loadLSST.bash && exec /bin/sh" ]
+    # Unknown shell error: command: [ "bash", "-c", "source /opt/lsst/software/stack/loadLSST.bash && exec bash" ]
+    # Unknown shell error: command: [ "bash", "-c", "source /opt/lsst/software/stack/loadLSST.bash" ]
+    # Unknown shell error: command: [ "bash", "-c", "source /opt/lsst/software/stack/loadLSST.bash && setup lsst_obs" ]
+    # works: command: [ "bash", "-c", "echo $OTHER_ARGUMENTS" ]
+    # works: command: [ "bash", "-c", "echo \"$FROMREPO\"" , "echo \"$TOREPO\"", "echo \"$INSTRUMENT\"", "echo --log \"$LOG\"", "echo --pastembargohours \"$PASTEMBARGO\"", "echo $DATAQUERIES", "echo $OTHER_ARGUMENTS" ]
     env:
     - name: FROMREPO
       value: "s3://rubin-summit-users/butler.yaml"
@@ -53,17 +64,15 @@ spec:
     #  value: "/sdf/data/rubin/user/rnevin/transfer_embargo/tests/data/test_to"
     - name: INSTRUMENT
       value: "LATISS"
-    - name: EMBARGO_HRS
-      value: "80"
-    - name: NOW
-      value: "now"
     - name: LOG
       value: "True"
     - name: PASTEMBARGO
-      value: "50.0"
+      value: "1.0"
     - name: DATAQUERIES
     #  value: '{ "datasettype": "raw", "collections": "LATISS/raw/all"}'
       value: '{ "datasettype": ["raw"], "collections": ["LATISS/raw/all"]}'
+    - name: OTHER_ARGUMENTS
+      value: "--embargohours \"80\" --nowtime \"now\""
     #- name: DATASETTYPE
     #  value: "\"raw\",\"calexp\""
     #- name: COLLECTIONS
