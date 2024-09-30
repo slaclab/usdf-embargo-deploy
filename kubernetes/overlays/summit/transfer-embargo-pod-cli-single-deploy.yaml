@@ -74,7 +74,8 @@ spec:
     - name: DATAQUERIES
       value: "{\"datasettype\":\"raw\",\"collections\":\"LATISS/raw/all\"}"
     - name: OTHER_ARGUMENTS
-      value: "--embargohours 80 --nowtime \"now\""
+    #  value: "--embargohours 80 --nowtime \"now\""
+      value: "--embargohours 80 --nowtime now"
     #- name: DATASETTYPE
     #  value: "\"raw\",\"calexp\""
     #- name: COLLECTIONS
