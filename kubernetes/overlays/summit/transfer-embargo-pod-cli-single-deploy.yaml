@@ -41,18 +41,19 @@ spec:
   - name: transfer-embargo-container
     image: "ghcr.io/lsst-dm/transfer-embargo:latest"
     imagePullPolicy: Always
-    command: [ "/bin/bash", "-c", "chmod +x /opt/lsst/software/stack/loadLSST.bash && source /opt/lsst/software/stack/loadLSST.bash && exec /bin/bash" ]
-    #command: [ "/bin/bash", "-c", ". /opt/lsst/software/stack/loadLSST.bash && exec /bin/bash" ]
-    # Unknown shell: command: [ "/bin/bash", "-c", "source /opt/lsst/software/stack/loadLSST.bash && exec /bin/bash" ]
-    # works: command: [ "/bin/bash", "-c", "echo 'Bash is working!'" ]
-    # Unknown shell error: command: [ "bash", "-c", "source \"/opt/lsst/software/stack/loadLSST.bash\"" ]
-    # Unknown shell error: command: [ "/bin/sh", "-c", "source /opt/lsst/software/stack/loadLSST.bash && exec /bin/sh" ]
-    # Unknown shell error: command: [ "bash", "-c", "source /opt/lsst/software/stack/loadLSST.bash && exec bash" ]
-    # Unknown shell error: command: [ "bash", "-c", "source /opt/lsst/software/stack/loadLSST.bash" ]
-    # Unknown shell error: command: [ "bash", "-c", "source /opt/lsst/software/stack/loadLSST.bash && setup lsst_obs" ]
-    # works: command: [ "bash", "-c", "echo $OTHER_ARGUMENTS" ]
+    command:
+    - "/usr/bin/bash"
+    - "-c"
+    - "source /opt/lsst/software/stack/loadLSST.bash; setup obs_lsst; python src/move_embargo_args.py $FROMREPO $TOREPO $INSTRUMENT --log $LOG --pastembargohours $PASTEMBARGO --dataqueries $DATAQUERIES $OTHER_ARGUMENTS"
+    #- "source /opt/lsst/software/stack/loadLSST.bash; setup obs_lsst; python src/move_embargo_args.py -h"
     # works: command: [ "bash", "-c", "echo \"$FROMREPO\"" , "echo \"$TOREPO\"", "echo \"$INSTRUMENT\"", "echo --log \"$LOG\"", "echo --pastembargohours \"$PASTEMBARGO\"", "echo $DATAQUERIES", "echo $OTHER_ARGUMENTS" ]
     env:
+    - name: SHELL
+      value: /usr/bin/bash
+    - name: LOGNAME
+      value: rubinmgr
+    - name: HOME
+      value: /tmp
     - name: FROMREPO
       value: "s3://rubin-summit-users/butler.yaml"
     - name: TOREPO
@@ -68,11 +69,12 @@ spec:
       value: "True"
     - name: PASTEMBARGO
       value: "1.0"
+    - name: LOG
+      value: "INFO"
     - name: DATAQUERIES
-    #  value: '{ "datasettype": "raw", "collections": "LATISS/raw/all"}'
-      value: '{ "datasettype": ["raw"], "collections": ["LATISS/raw/all"]}'
+      value: "{\"datasettype\":\"raw\",\"collections\":\"LATISS/raw/all\"}"
     - name: OTHER_ARGUMENTS
-      value: "--embargohours \"80\" --nowtime \"now\""
+      value: "--embargohours 80 --nowtime \"now\""
     #- name: DATASETTYPE
     #  value: "\"raw\",\"calexp\""
     #- name: COLLECTIONS
