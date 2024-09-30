@@ -10,7 +10,7 @@ images:
 - name: docker.io/redis
   newTag: "7.0.15"
 - name: ghcr.io/lsst-dm/transfer-embargo
-  newTag: "dm-41033"
+  newTag: "latest"
 
 namespace: summit
 
