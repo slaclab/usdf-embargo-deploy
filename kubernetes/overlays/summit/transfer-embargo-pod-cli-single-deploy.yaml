@@ -45,8 +45,6 @@ spec:
     - "/usr/bin/bash"
     - "-c"
     - "source /opt/lsst/software/stack/loadLSST.bash; setup obs_lsst; python src/move_embargo_args.py $FROMREPO $TOREPO $INSTRUMENT --log $LOG --pastembargohours $PASTEMBARGO --dataqueries $DATAQUERIES $OTHER_ARGUMENTS"
-    #- "source /opt/lsst/software/stack/loadLSST.bash; setup obs_lsst; python src/move_embargo_args.py -h"
-    # works: command: [ "bash", "-c", "echo \"$FROMREPO\"" , "echo \"$TOREPO\"", "echo \"$INSTRUMENT\"", "echo --log \"$LOG\"", "echo --pastembargohours \"$PASTEMBARGO\"", "echo $DATAQUERIES", "echo $OTHER_ARGUMENTS" ]
     env:
     - name: SHELL
       value: /usr/bin/bash
@@ -58,33 +56,18 @@ spec:
       value: "s3://rubin-summit-users/butler.yaml"
     - name: TOREPO
       value: "/sdf/data/rubin/user/rnevin/scratch"
-    #  value: "s3://lsst/users/rnevin/scratch"
-    #  value: "/sdf/home/r/rnevin/scratch"
-    #  value: "/sdf/data/rubin/user/rnevin/scratch"
-    #  value: "/sdf/group/rubin/repo/prompt"
-    #  value: "/sdf/data/rubin/user/rnevin/transfer_embargo/tests/data/test_to"
     - name: INSTRUMENT
       value: "LATISS"
     - name: LOG
       value: "True"
     - name: PASTEMBARGO
-      value: "1.0"
+      value: "20.0"
     - name: LOG
       value: "INFO"
     - name: DATAQUERIES
       value: "{\"datasettype\":\"raw\",\"collections\":\"LATISS/raw/all\"}"
     - name: OTHER_ARGUMENTS
-    #  value: "--embargohours 80 --nowtime \"now\""
       value: "--embargohours 80 --nowtime now"
-    #- name: DATASETTYPE
-    #  value: "\"raw\",\"calexp\""
-    #- name: COLLECTIONS
-    #  value: "\"LATISS/raw/all\",\"LATISS/runs/AUXTEL_DRP_IMAGING_2022-11A/w_2022_46/PREOPS-1616\""
-    #- name: DATAQUERIES
-    #  valueFrom:
-    #    configMapKeyRef:
-    #      name: transfer-config
-    #      key: transfer.yml
     - name: PGPASSWORD
       valueFrom:
           secretKeyRef:
@@ -107,32 +90,12 @@ spec:
         secretKeyRef:
           name: s3
           key: s3_key
-    #- name: DATAQUERIES
-    #  value: |
-    #    [
-    #      {
-    #        "datasettype": "raw",
-    #        "collections": "LATISS/raw/all"
-    #      },
-    #      {
-    #        "datasettype": "calexp",
-    #        "collections": "LATISS/runs/AUXTEL_DRP_IMAGING_2022-11A/w_2022_46/PREOPS-1616"
-    #      }
-    #    ]
     volumeMounts:
-      #- name: config
-        # directory in the container:
-        # it does not need to exist already,
-        # make apply will make sure it exists
-      #  mountPath: /etc/config
       - name: sdf-group-rubin
         mountPath: /sdf/group/rubin
       - name: sdf-data-rubin
         mountPath: /sdf/data/rubin
   volumes:
-  #- name: config
-  #  configMap:
-  #    name: transfer-config
   - name: sdf-group-rubin
     persistentVolumeClaim:
       claimName: sdf-group-rubin
