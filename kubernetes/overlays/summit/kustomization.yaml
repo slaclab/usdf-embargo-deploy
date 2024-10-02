@@ -41,3 +41,4 @@ secretGenerator:
 - name: notification
   files:
   - secret=etc/.secrets/notification
+
