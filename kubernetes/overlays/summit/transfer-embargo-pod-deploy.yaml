@@ -111,8 +111,8 @@ spec:
     configMap:
       name: transfer-config
       items:
-      - key: "transfer.cfg"
-        path: "transfer.cfg"
+      - key: "etc/transfer-config.cfg"
+        path: "etc/transfer-config.cfg"
   restartPolicy: OnFailure
 
 
