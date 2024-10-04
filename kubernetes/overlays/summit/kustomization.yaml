@@ -41,4 +41,5 @@ secretGenerator:
 - name: notification
   files:
   - secret=etc/.secrets/notification
+  - pg_username=etc/.secrets/pg_user
 
