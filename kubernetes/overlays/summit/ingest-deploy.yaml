@@ -60,6 +60,8 @@ spec:
             secretKeyRef:
               name: s3
               key: s3_key
+        - name: WEBHOOK_URI
+          value: http://lsstcam-mcm.cp.lsst.org/FITSInfo/rest/webhook/update
         resources:
           limits:
             cpu: "1"
