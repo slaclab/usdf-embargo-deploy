@@ -10,7 +10,7 @@ images:
 - name: docker.io/redis
   newTag: "7.0.15"
 - name: ghcr.io/lsst-dm/transfer-embargo
-  newTag: "latest"
+  newTag: "dm-41033"
 
 namespace: summit
 
@@ -21,7 +21,7 @@ resources:
 - ingest-deploy.yaml
 - presence-deploy.yaml
 - redis-deploy.yaml
-- transfer-embargo-pod-single-cli-deploy.yaml
+- transfer-embargo-pod-cli-single-deploy.yaml
 
 secretGenerator:
 - name: s3
