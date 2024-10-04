@@ -21,7 +21,7 @@ resources:
 - ingest-deploy.yaml
 - presence-deploy.yaml
 - redis-deploy.yaml
-- transfer-embargo-deploy.yaml
+- transfer-embargo-pod-single-cli-deploy.yaml
 
 secretGenerator:
 - name: s3
