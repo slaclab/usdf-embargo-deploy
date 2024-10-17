@@ -40,6 +40,8 @@ spec:
         env:
         - name: PROFILE
           value: embargo
+        - name: DATASET_REGEXP
+          value: '\d\.fits$'
         - name: REDIS_HOST
           value: redis
         - name: REDIS_PASSWORD
