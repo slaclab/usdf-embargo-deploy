@@ -25,14 +25,24 @@ spec:
         - "/bin/bash"
         - "-c"
         - |
+          groupadd -g 4085 rubin_users
+          useradd -g rubin_users -u 17951 -m lsstsvc1
           cp -RL /secrets-raw/* /secrets
           chmod 0400 /secrets/*
+          chown -R lsstsvc1 /secrets/*
+          cp -R /etc/* /newetc
+        securityContext:
+          runAsUser: 0
         volumeMounts:
         - mountPath: /secrets-raw
           name: db-auth
           readOnly: true
         - mountPath: /secrets
           name: secrets
+        - mountPath: /newetc
+          name: etc
+        - mountPath: /home/lsstsvc1
+          name: home
       containers:
       - name: ingest
         image: "ghcr.io/lsst-dm/embargo-butler-ingest:prod"
@@ -64,8 +74,15 @@ spec:
           limits:
             cpu: 500m
             memory: "1Gi"
+        securityContext:
+          runAsUser: 17951
+          runAsGroup: 4085
         volumeMounts:
-        - mountPath: /home/lsst/.lsst
+        - mountPath: /etc
+          name: etc
+        - mountPath: /home/lsstsvc1
+          name: home
+        - mountPath: /home/lsstsvc1/.lsst
           name: secrets
         - mountPath: "/sdf/data/rubin"
           name: "sdf-data-rubin"
@@ -73,6 +90,10 @@ spec:
           name: "sdf-group-rubin"
       volumes:
       - name: secrets
+        emptyDir: {}
+      - name: etc
+        emptyDir: {}
+      - name: home
         emptyDir: {}
       - name: db-auth
         secret:
