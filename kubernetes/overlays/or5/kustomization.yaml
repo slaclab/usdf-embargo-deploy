@@ -1,0 +1,35 @@
+images:
+- name: ghcr.io/lsst-dm/embargo-butler-enqueue
+  newTag: "1.2.1"
+- name: ghcr.io/lsst-dm/embargo-butler-ingest
+  newTag: "1.2.1"
+- name: ghcr.io/lsst-dm/embargo-butler-idle
+  newTag: "1.2.1"
+- name: ghcr.io/lsst-dm/embargo-butler-presence
+  newTag: "1.2.1"
+- name: docker.io/redis
+  newTag: "7.0.15"
+
+namespace: or5
+
+resources:
+- ns.yaml
+- enqueue-deploy.yaml
+- idle-deploy.yaml
+- ingest-deploy.yaml
+- presence-deploy.yaml
+- redis-deploy.yaml
+
+secretGenerator:
+- name: s3
+  files:
+  - profile=etc/.secrets/profile
+- name: redis
+  files:
+  - redis-password=etc/.secrets/redis
+- name: db-auth
+  files:
+  - db-auth.yaml=etc/.secrets/db-auth.yaml
+- name: notification
+  files:
+  - secret=etc/.secrets/notification
