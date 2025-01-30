@@ -87,7 +87,7 @@ Note that changing a topic's attributes does not take effect until the bucket no
 
 # Deployment Structure
 
-The ingest services are comprised of a Redis pod, a single "enqueue" pod, a single "idle" cleanup pod, and a set of one or more "ingest" pods.
+The ingest services are comprised of a Redis pod, a single "enqueue" pod, a single "idle" cleanup pod, a single "presence" pod, and a set of one or more "ingest" pods.
 
 Redis is the inter-pod communications mechanism via persistent queues, and it also acts as the monitoring database.
 
@@ -97,6 +97,8 @@ The "ingest" pods take the object store keys from the main queue, copy them atom
 
 The "idle" pod looks for worker queues that have not been modified in a while, indicating that the corresponding "ingest" pod has died.
 It pushes the contents of such queues back onto the main queue so that they're available to other "ingest" pods.
+
+The "presence" pod provides a microservice for Prompt Processing to look up image paths based on group and snap IDs.
 
 Each pod type has a deployment YAML.
 There is also a ``ns.yaml`` that defines the namespace for each environment.
@@ -112,7 +114,7 @@ Obtain a token to access the secrets in vault:
 ```
 # obtain token to access secrets
 export VAULT_ADDR=https://vault.slac.stanford.edu
-vault login -method ldap -username <username>
+vault login -method ldap username=<username>
 ```
 Alternatively, especially for those without Windows LDAP accounts, copy the token from the web interface at vault.slac.stanford.edu and provide it to ``vault login``.
 
