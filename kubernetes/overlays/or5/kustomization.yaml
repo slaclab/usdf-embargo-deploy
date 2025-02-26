@@ -1,12 +1,12 @@
 images:
 - name: ghcr.io/lsst-dm/embargo-butler-enqueue
-  newTag: "1.2.1"
+  newTag: "DM-48470"
 - name: ghcr.io/lsst-dm/embargo-butler-ingest
-  newTag: "1.2.1"
+  newTag: "DM-48470"
 - name: ghcr.io/lsst-dm/embargo-butler-idle
-  newTag: "1.2.1"
+  newTag: "DM-48470"
 - name: ghcr.io/lsst-dm/embargo-butler-presence
-  newTag: "1.2.1"
+  newTag: "DM-48470"
 - name: docker.io/redis
   newTag: "7.0.15"
 
