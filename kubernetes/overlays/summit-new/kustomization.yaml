@@ -2,7 +2,7 @@ images:
 - name: ghcr.io/lsst-dm/embargo-butler-enqueue
   newTag: "1.2.1"
 - name: ghcr.io/lsst-dm/embargo-butler-ingest
-  newTag: "1.2.4"
+  newTag: "1.2.5"
 - name: ghcr.io/lsst-dm/embargo-butler-idle
   newTag: "1.2.1"
 - name: ghcr.io/lsst-dm/embargo-butler-presence
