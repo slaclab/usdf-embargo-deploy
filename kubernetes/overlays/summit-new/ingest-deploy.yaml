@@ -43,6 +43,8 @@ spec:
             secretKeyRef:
               name: s3
               key: profile
+        - name: MAX_INGESTS
+          value: "50"
         - name: REDIS_HOST
           value: redis
         - name: BUCKET
