@@ -42,8 +42,6 @@ spec:
             image: ghcr.io/lsst-dm/transfer-raw:placeholder
             imagePullPolicy: Always
             env:
-            - name: DRY_RUN
-              value: "--dry_run"
             - name: TMPDIR
               value: "/tmp"
             - name: LOGNAME
