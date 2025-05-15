@@ -1,0 +1,123 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: transfer-embargo-raw
+spec:
+  # Every 15 minutes starting at :04 after the hour
+  schedule: "4/15 * * * *"
+  # Save up to 12 hours of failures
+  failedJobsHistoryLimit: 48
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          initContainers:
+          - name: fix-secret-permissions
+            image: busybox
+            imagePullPolicy: IfNotPresent
+            command: ["/bin/sh"]
+            args:
+              - -c
+              - |
+                cp -RL /tmp/secrets-raw/* /secrets/
+                chown 18296:4085 /secrets/*
+                chmod 0400 /secrets/*
+            resources:
+              limits:
+                cpu: "1"
+                memory: "100Mi"
+              requests:
+                cpu: "100m"
+                memory: "10Mi"
+            volumeMounts:
+            - name: secrets-raw
+              mountPath: /tmp/secrets-raw
+              readOnly: true
+            - name: secrets
+              mountPath: /secrets/
+              readOnly: false
+          containers:
+          - name: transfer-raws
+            image: ghcr.io/lsst-dm/transfer-raw:placeholder
+            imagePullPolicy: Always
+            env:
+            - name: DRY_RUN
+              value: "--dry_run"
+            - name: TMPDIR
+              value: "/tmp"
+            - name: LOGNAME
+              value: "rubinmgr"
+            - name: WINDOW
+              # Allow for missing or delayed jobs
+              value: "35min"
+            - name: DEST
+              value: "/sdf/data/rubin/lsstdata/offline/instrument/"
+            - name: RUCIO
+              value: "-r SLAC_RAW_DISK -s raw"
+            - name: RUCIO_CONFIG
+              value: "/config/rucio.cfg"
+            - name: TRANSFER_CONFIG
+              value: "/config/config_raw.yaml"
+            - name: DAF_BUTLER_REPOSITORY_INDEX
+              value: "/sdf/group/rubin/shared/data-repos.yaml"
+            - name: PGUSER
+              value: "rubin"
+            - name: PGPASSFILE
+              value: "/secrets/postgres-credentials.txt"
+            - name: LSST_RESOURCES_S3_PROFILE_embargo
+              value: "https://sdfembs3.sdf.slac.stanford.edu"
+            - name: AWS_SHARED_CREDENTIALS_FILE
+              value: "/secrets/aws-credentials.ini"
+            - name: LOGDIR
+              value: "/sdf/data/rubin/user/rubinmgr/transfer_embargo/logs/"
+            resources:
+              limits:
+                cpu: "4"
+                memory: "1Gi"
+              requests:
+                cpu: "500m"
+                memory: "100Mi"
+            securityContext:
+              runAsUser: 18296
+              runAsGroup: 4085
+            volumeMounts:
+            - name: secrets
+              mountPath: /secrets/
+              readOnly: true
+            - name: temp
+              mountPath: /tmp/
+            - name: config
+              mountPath: /config/
+              readOnly: true
+            - name: sdf-data-rubin
+              mountPath: /sdf/data/rubin/
+            - name: sdf-group-rubin
+              mountPath: /sdf/group/rubin/
+          volumes:
+          - name: secrets
+            emptyDir:
+              sizeLimit: 1Mi
+          - name: temp
+            emptyDir:
+              sizeLimit: 8Gi
+          - name: secrets-raw
+            secret:
+              secretName: transfer-raw-secrets
+              items:
+              - key: aws-credentials.ini
+                path: aws-credentials.ini
+              - key: postgres-credentials.txt
+                path: postgres-credentials.txt
+              - key: rucio_key
+                path: rucio_key
+              defaultMode: 0400
+          - name: config
+            configMap:
+              name: transfer-raw-config
+          - name: sdf-data-rubin
+            persistentVolumeClaim:
+              claimName: sdf-data-rubin
+          - name: sdf-group-rubin
+            persistentVolumeClaim:
+              claimName: sdf-group-rubin

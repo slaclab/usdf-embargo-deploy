@@ -1,0 +1,23 @@
+images:
+- name: ghcr.io/lsst-dm/transfer-raw
+  newTag: "tickets-DM-49999"
+
+namespace: transfer
+
+resources:
+- ns.yaml
+- pvcs.yaml
+- transfer-raw-deploy.yaml
+
+configMapGenerator:
+- name: transfer-raw-config
+  files:
+  - cfg/config_raw.yaml
+  - cfg/rucio.cfg
+
+secretGenerator:
+- name: transfer-raw-secrets
+  files:
+  - aws-credentials.ini=etc/.secrets/aws-credentials.ini
+  - postgres-credentials.txt=etc/.secrets/postgres-credentials.txt
+  - rucio_key=etc/.secrets/rucio_key
