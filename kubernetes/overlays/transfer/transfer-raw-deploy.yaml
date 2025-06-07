@@ -9,6 +9,7 @@ spec:
   failedJobsHistoryLimit: 48
   jobTemplate:
     spec:
+      backoffLimit: 0
       template:
         spec:
           restartPolicy: Never
