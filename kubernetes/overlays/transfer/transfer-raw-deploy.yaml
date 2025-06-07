@@ -99,7 +99,7 @@ spec:
               sizeLimit: 1Mi
           - name: temp
             emptyDir:
-              sizeLimit: 8Gi
+              sizeLimit: 16Gi
           - name: secrets-raw
             secret:
               secretName: transfer-raw-secrets
