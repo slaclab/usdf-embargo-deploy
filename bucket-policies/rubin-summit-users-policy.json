@@ -22,6 +22,17 @@
       "arn:aws:s3:::rubin-summit-users",
       "arn:aws:s3:::rubin-summit-users/*"
     ]
+  },
+  {
+    "Sid": "deny-write-lsstcam-raw-rubin-summit-users",
+    "Effect": "Deny",
+    "Principal": {
+      "AWS": "arn:aws:iam:::user/rubin-summit-users"
+    },
+    "Action": "s3:PutObject",
+    "Resource": [
+      "arn:aws:s3:::rubin-summit-users/LSSTCam/raw/*"
+    ]
   }]
 }
 
