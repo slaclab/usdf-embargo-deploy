@@ -1,6 +1,8 @@
 images:
 - name: ghcr.io/lsst-dm/transfer-raw
-  newTag: "tickets-DM-49999"
+  newTag: "tickets-DM-51296"
+- name: ghcr.io/lsst-dm/transfer-non-raw
+  newTag: "tickets-DM-51296"
 
 namespace: transfer
 
@@ -14,6 +16,9 @@ configMapGenerator:
   files:
   - cfg/config_raw.yaml
   - cfg/rucio.cfg
+- name: transfer-non-raw-config
+  files:
+  - cfg/config_non_raw.yaml
 
 secretGenerator:
 - name: transfer-secrets
