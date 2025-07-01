@@ -1,15 +1,20 @@
+- instrument: LATISS
+  embargo_hours: 0
+  where: ""
+  dataset_types: raw
+  collections: LATISS/raw/all
 - instrument: LSSTComCam
   embargo_hours: 0
   where: ""
   dataset_types: raw
   collections: LSSTComCam/raw/all
 - instrument: LSSTCam
-  where: "not exposure.can_see_sky"
+  where: "not exposure.can_see_sky AND (exposure.observation_type IN ('bias', 'dark', 'flat', 'flat_dark'))"
   embargo_hours: 0
   dataset_types: raw
   collections: LSSTCam/raw/all
 - instrument: LSSTCam
-  where: "exposure.can_see_sky"
+  where: "exposure.can_see_sky OR (exposure.can_see_sky = NULL) OR (exposure.observation_type NOT IN ('bias', 'dark', 'flat', 'flat_dark'))"
   embargo_hours: 720
   dataset_types: raw
   collections: LSSTCam/raw/all
