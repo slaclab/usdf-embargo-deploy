@@ -16,7 +16,7 @@ configMapGenerator:
   - cfg/rucio.cfg
 
 secretGenerator:
-- name: transfer-raw-secrets
+- name: transfer-secrets
   files:
   - aws-credentials.ini=etc/.secrets/aws-credentials.ini
   - postgres-credentials.txt=etc/.secrets/postgres-credentials.txt

@@ -102,7 +102,7 @@ spec:
               sizeLimit: 16Gi
           - name: secrets-raw
             secret:
-              secretName: transfer-raw-secrets
+              secretName: transfer-secrets
               items:
               - key: aws-credentials.ini
                 path: aws-credentials.ini
