@@ -8,8 +8,12 @@ if [[ $# -lt 1 ]]; then
   echo "Missing date (YYYY-MM-DD) parameter"
   exit 1
 fi
+if [ $(kubectl config current-context) != "usdf-embargo-dmz" ]; then
+  echo "Wrong vcluster context for kubectl"
+  exit 2
+fi
 if ! kubectl get ns | grep transfer > /dev/null; then
-  echo "No kubectl access or wrong vcluster"
+  echo "No kubectl access to vcluster"
   exit 2
 fi
 DAY_OBS=$1
