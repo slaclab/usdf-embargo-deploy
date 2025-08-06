@@ -14,10 +14,12 @@ if ! kubectl get ns | grep transfer > /dev/null; then
   echo "No kubectl access to vcluster"
   exit 2
 fi
-label=$(basename $1 .datasets)
+dataset_file=$1
+label=$(echo $(basename $dataset_file .datasets) | tr -C -d A-Za-z0-9-)
+lowerlabel=$(echo "$label" | tr A-Z a-z)
 njobs=${2:-1}
 
-split -n r/$njobs --numeric-suffixes=1 $1 ${label}.part
+split -n r/$njobs --numeric-suffixes=1 "$dataset_file" ${label}.part
 
 for i in $(seq -w 01 $njobs); do
   infile=$(realpath "${label}.part$i")
@@ -28,7 +30,7 @@ for i in $(seq -w 01 $njobs); do
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: from-list-${label}-${i}-$(date +%s)
+  name: from-list-${lowerlabel}-${i}-$(date +%s)
   namespace: transfer
 spec:
   template:
