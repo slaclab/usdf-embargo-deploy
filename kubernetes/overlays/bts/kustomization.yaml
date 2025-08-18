@@ -16,6 +16,7 @@ resources:
 - idle-deploy.yaml
 - ingest-deploy.yaml
 - redis-deploy.yaml
+- embargo-metrics-deploy.yaml
 
 secretGenerator:
 - name: s3
