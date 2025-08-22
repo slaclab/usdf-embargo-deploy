@@ -1,0 +1,107 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sdf-group-rubin
+  # namespace: devel-transfer-embargo
+  # namespace: summit
+spec:
+  storageClassName: sdf-group-rubin
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sdf-data-rubin
+  # namespace: devel-transfer-embargo
+  # namespace: summit
+spec:
+  storageClassName: sdf-data-rubin
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: transfer-embargo-temp
+  # namespace: devel-transfer-embargo
+  # namespace: summit
+spec:
+  securityContext:
+    runAsUser: 18296
+    runAsGroup: 4085
+  containers:
+  - name: transfer-embargo-container
+    image: "ghcr.io/lsst-dm/transfer-embargo:latest"
+    imagePullPolicy: Always
+    command:
+    - "/usr/bin/bash"
+    - "-c"
+    - "source /opt/lsst/software/stack/loadLSST.bash; setup obs_lsst; python src/move_embargo_args.py $FROMREPO $TOREPO $INSTRUMENT --log $LOG --pastembargohours $PASTEMBARGO --dataqueries $DATAQUERIES $OTHER_ARGUMENTS"
+    env:
+    - name: SHELL
+      value: /usr/bin/bash
+    - name: LOGNAME
+      value: rubinmgr
+    - name: HOME
+      value: /tmp
+    - name: FROMREPO
+      value: "s3://rubin-summit-users/butler.yaml"
+    - name: TOREPO
+      value: "/sdf/data/rubin/user/rnevin/scratch"
+    - name: INSTRUMENT
+      value: "LATISS"
+    - name: LOG
+      value: "True"
+    - name: PASTEMBARGO
+      value: "20.0"
+    - name: LOG
+      value: "INFO"
+    - name: DATAQUERIES
+      value: "{\"datasettype\":\"raw\",\"collections\":\"LATISS/raw/all\"}"
+    - name: OTHER_ARGUMENTS
+      value: "--embargohours 80 --nowtime now"
+    - name: PGPASSWORD
+      valueFrom:
+          secretKeyRef:
+            name: db-env
+            key: pg_password
+    - name: PGUSER
+      valueFrom:
+          secretKeyRef:
+            name: db-env
+            key: pg_username
+    - name: S3_ENDPOINT_URL
+      value: https://s3dfrgw.slac.stanford.edu
+    - name: AWS_ACCESS_KEY_ID
+      valueFrom:
+        secretKeyRef:
+          name: s3
+          key: s3_access
+    - name: AWS_SECRET_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          name: s3
+          key: s3_key
+    volumeMounts:
+      - name: sdf-group-rubin
+        mountPath: /sdf/group/rubin
+      - name: sdf-data-rubin
+        mountPath: /sdf/data/rubin
+  volumes:
+  - name: sdf-group-rubin
+    persistentVolumeClaim:
+      claimName: sdf-group-rubin
+      # storageClassName: sdf-group-rubin
+  - name: sdf-data-rubin
+    persistentVolumeClaim:
+      claimName: sdf-data-rubin
+      # storageClassName: sdf-data-rubin
+  restartPolicy: OnFailure
