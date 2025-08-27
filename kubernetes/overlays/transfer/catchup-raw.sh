@@ -95,11 +95,11 @@ spec:
           value: "/sdf/data/rubin/user/rubinmgr/transfer_embargo/logs-jobs/"
         resources:
           limits:
-            cpu: "4"
-            memory: "1Gi"
+            cpu: "2"
+            memory: "8Gi"
           requests:
             cpu: "500m"
-            memory: "100Mi"
+            memory: "300Mi"
         securityContext:
           runAsUser: 18296
           runAsGroup: 4085
