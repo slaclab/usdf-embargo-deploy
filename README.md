@@ -84,6 +84,8 @@ s3api --profile=wsummit put-bucket-notification-configuration --bucket=rubin-sum
 The file path must be visible to the apptainer container, which usually means that it must be under ``/sdf/home`` (and not symlinked from ``/sdf/data``).
 
 Note that changing a topic's attributes does not take effect until the bucket notification configurations are rewritten, even if they're updated with the exact same JSON.
+When modifying the notification configuration, Ceph allows additional configurations to be "stacked" on top of existing configurations.
+But to change an existing configuration, it is necessary to reset the configuration to empty (putting an empty JSON) and then create a new configuration.
 
 # Deployment Structure
 
