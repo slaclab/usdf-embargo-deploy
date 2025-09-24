@@ -44,7 +44,7 @@ Setting up bucket notifications in S3 (including Ceph) requires two things: crea
 
 Creating a topic uses parameters specified in the [Ceph Bucket Notifications documentation](https://docs.ceph.com/en/latest/radosgw/notifications/#create-a-topic).
 For a Kakfa or webhook topic, make sure to specify ``push-endpoint`` as a URI.
-The auto-ingest system expects ``persistent=true`` in order to allow Ceph to return status as soon as an object is created, without waiting for the notification.
+The auto-ingest system expects ``persistent=true`` in order to allow Ceph to return status as soon as an object is created, without waiting for the notification.  Please note that ``persistent=false`` is currently set for the auto-ingest system due to an issue with Ceph S3 notifications failing when ``persistent=true`` is set.   Once the correct setting for ``persistent`` is determined this section of the documentation and the deployment scripts will be updated.
 The auto-ingest system also expects webhooks to have an ``OpaqueData`` item which matches the ``notification`` secret in ``vault.slac.stanford.edu``.
 Sample command:
 ```
@@ -86,6 +86,8 @@ The file path must be visible to the apptainer container, which usually means th
 Note that changing a topic's attributes does not take effect until the bucket notification configurations are rewritten, even if they're updated with the exact same JSON.
 When modifying the notification configuration, Ceph allows additional configurations to be "stacked" on top of existing configurations.
 But to change an existing configuration, it is necessary to reset the configuration to empty (putting an empty JSON) and then create a new configuration.
+
+Configuration for deploying Prompt Processing and Ingest Service notifications are [here for dev](bucket-notifications/dev/rubin-pp-dev-topic.sh) and [here for prod](bucket-notifications/prod/rubin-summit-topic.sh).  Run the commands in the shell script files from the `rubin-devl` nodes.
 
 # Deployment Structure
 
