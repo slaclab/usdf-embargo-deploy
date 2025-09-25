@@ -1,0 +1,18 @@
+{
+    "TopicConfigurations": [
+        {
+            "Id": "pp-dev-microservice-202509",
+            "TopicArn": "arn:aws:sns:default::pp-dev-microservice-202509",
+            "Events": [
+                "s3:ObjectCreated:*"
+            ]
+        },
+        {
+            "Id": "prompt-processing-dev",
+            "TopicArn": "arn:aws:sns:default::prompt-processing-dev",
+            "Events": [
+                "s3:ObjectCreated:*"
+            ]
+        }
+    ]
+}
