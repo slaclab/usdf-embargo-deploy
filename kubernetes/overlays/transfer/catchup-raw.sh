@@ -122,10 +122,10 @@ spec:
           sizeLimit: 1Mi
       - name: temp
         emptyDir:
-          sizeLimit: 16Gi
+          sizeLimit: 100Gi
       - name: secrets-raw
         secret:
-          secretName: transfer-secrets-94ddchd28g
+          secretName: transfer-secrets-bb5m7m6mt4
           items:
           - key: aws-credentials.ini
             path: aws-credentials.ini
@@ -136,7 +136,7 @@ spec:
           defaultMode: 0400
       - name: config
         configMap:
-          name: transfer-raw-config-b5458d59m7
+          name: transfer-raw-config-fgd6c275ff
       - name: sdf-data-rubin
         persistentVolumeClaim:
           claimName: sdf-data-rubin
