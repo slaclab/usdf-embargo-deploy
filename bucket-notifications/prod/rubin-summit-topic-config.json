@@ -1,15 +1,15 @@
 {
     "TopicConfigurations": [
         {
-            "Id": "rubin-ingest-embargo-new",
-            "TopicArn": "arn:aws:sns:sdfembargo::rubin-summit-new",
+            "Id": "rubin-ingest-embargo-new-2",
+            "TopicArn": "arn:aws:sns:rubin-zg::rubin-ingest-embargo-new-2",
             "Events": [
                 "s3:ObjectCreated:*"
             ]
         },
         {
-            "Id": "rubin-summit-notification-6",
-            "TopicArn": "arn:aws:sns:sdfembargo::rubin-summit-notification-6",
+            "Id": "rubin-summit-notification-7",
+            "TopicArn": "arn:aws:sns:sdfembargo::rubin-summit-notification-7",
             "Events": [
                 "s3:ObjectCreated:*"
             ]
