@@ -10,6 +10,7 @@ metadata:
     metallb.io/loadBalancerIPs: 172.24.5.156
 spec:
   type: LoadBalancer
+  allocateLoadBalancerNodePorts: false
   ports:
   - name: enqueue-webhook
     port: 8080

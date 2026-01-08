@@ -10,6 +10,7 @@ metadata:
     metallb.io/loadBalancerIPs: 172.24.5.158
 spec:
   type: LoadBalancer
+  allocateLoadBalancerNodePorts: false
   ports:
   - name: presence-http
     port: 8080
