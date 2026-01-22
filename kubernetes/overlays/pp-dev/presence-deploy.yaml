@@ -5,8 +5,11 @@ metadata:
   name: embargo-butler-presence
   labels:
     app: presence
+  annotations:
+    metallb.io/address-pool: sdf-services
 spec:
   type: LoadBalancer
+  allocateLoadBalancerNodePorts: false
   ports:
   - name: presence-http
     port: 8080
