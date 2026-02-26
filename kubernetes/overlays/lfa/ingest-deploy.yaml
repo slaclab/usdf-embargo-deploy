@@ -44,7 +44,7 @@ spec:
         - name: BUCKET
           value: rubinobs-lfa-cp
         - name: BUTLER_REPO
-          value: /sdf/group/rubin/repo/main
+          value: /sdf/group/rubin/repo/main/
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -64,6 +64,8 @@ spec:
           limits:
             cpu: 500m
             memory: "1Gi"
+        securityContext:
+          runAsGroup: 4085
         volumeMounts:
         - mountPath: /home/lsst/.lsst
           name: secrets

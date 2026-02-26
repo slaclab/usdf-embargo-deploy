@@ -6,9 +6,11 @@ metadata:
   labels:
     app: enqueue
   annotations:
-    metallb.universe.tf/address-pool: sdf-services
+    metallb.io/address-pool: sdf-rubin-ingest
+    metallb.io/loadBalancerIPs: 172.24.10.41
 spec:
   type: LoadBalancer
+  allocateLoadBalancerNodePorts: false
   ports:
   - name: enqueue-webhook
     port: 8080
