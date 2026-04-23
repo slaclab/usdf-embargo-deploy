@@ -1,1 +1,3 @@
 .secrets
+# Local Vault materialization from overlay Makefiles (e.g. kubernetes/overlays/test)
+**/etc/.secrets/
