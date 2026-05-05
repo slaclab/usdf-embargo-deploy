@@ -1,0 +1,88 @@
+# SQLite Butler on PVC at /butler; created once in initContainer.
+# replicas: 1 — avoid two pods corrupting the same SQLite volume (RWX).
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embargo-butler-ingest
+  labels:
+    app: ingest
+    site: summit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ingest
+      site: summit
+  template:
+    metadata:
+      labels:
+        app: ingest
+        site: summit
+    spec:
+      initContainers:
+        - name: butler-init
+          image: "ghcr.io/lsst-dm/embargo-butler-ingest:prod"
+          command:
+            - "/bin/bash"
+            - "-c"
+            - |
+              set -e
+              source loadLSST.bash
+              setup lsst_obs
+              if [[ ! -f /butler/butler.yaml ]]; then
+                butler create /butler
+                butler register-instrument /butler lsst.obs.lsst.LsstCam
+                butler register-dataset-type /butler guider_raw Stamps band instrument day_obs detector group physical_filter exposure
+              else
+                echo "Butler repo already present on PVC; skipping create."
+              fi
+          volumeMounts:
+            - mountPath: /butler
+              name: butler
+      containers:
+        - name: ingest
+          image: "ghcr.io/lsst-dm/embargo-butler-ingest:prod"
+          imagePullPolicy: Always
+          env:
+            - name: LSST_RESOURCES_S3_PROFILE_embargo
+              valueFrom:
+                secretKeyRef:
+                  name: s3
+                  key: profile
+            - name: MAX_INGESTS
+              value: "50"
+            - name: REDIS_HOST
+              value: redis
+            - name: BUCKET
+              value: embargo@rubin-summit
+            - name: BUTLER_REPO
+              value: /butler
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis
+                  key: redis-password
+          resources:
+            limits:
+              cpu: "1"
+              memory: "2Gi"
+          volumeMounts:
+            - mountPath: /butler
+              name: butler
+      volumes:
+        - name: butler
+          persistentVolumeClaim:
+            claimName: butler-data-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: butler-data-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: wekafs--sdf-k8s01
+  resources:
+    requests:
+      storage: 1Gi

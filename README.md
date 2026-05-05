@@ -1,5 +1,6 @@
-# usdf_deploy
-Deployment configurations and scripts for the the data ingest from Rubin to the USDF.
+# usdf-embargo-deploy
+
+Deployment configurations and scripts for data ingest from Rubin to the USDF (embargo Butler services, bucket policies, notifications).
 
 
 # Background
@@ -128,7 +129,7 @@ cd kubernetes/overlays
 make apply
 ```
 The above will authenticate you against our vault instance so that you can obtain the most up-to-date secrets, download the passwords temporarily into your working directory, push the kubernetes manifests to the cluster and then subsequently remove the secrets.
-You can also apply one environment at a time.
+You can also apply one environment at a time (for example **`cd kubernetes/overlays/test && make apply`** for the dmz-dev **test** namespace; see [kubernetes/overlays/test/DEVELOPER-TESTING.md](kubernetes/overlays/test/DEVELOPER-TESTING.md)).
 
 The external (but SLAC-internal) IP address of the ``-butler-enqueue`` service needs to be used in the endpoint address for the webhook notification topic for the corresponding raw data bucket (e.g. ``http://172.24.5.180:8080/notify``).
 The OpaqueData value for that notification topic should match the notification secret in vault.
