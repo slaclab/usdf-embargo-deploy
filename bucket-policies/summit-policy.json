@@ -1,0 +1,19 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Sid": "rubin-summit-policy",
+    "Effect": "Allow",
+    "Principal": {"AWS": ["arn:aws:iam:::user/rubin-summit-users"]},
+    "Action": [
+      "s3:GetBucketLocation",
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:ListBucket",
+      "s3:ListBucketVersions"
+    ],
+    "Resource": [
+      "arn:aws:s3:::rubin-summit",
+      "arn:aws:s3:::rubin-summit/*"
+    ]
+  }]
+}
