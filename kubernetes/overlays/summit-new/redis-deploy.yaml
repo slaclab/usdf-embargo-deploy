@@ -6,9 +6,10 @@ metadata:
   labels:
     app: redis
   annotations:
-    metallb.universe.tf/address-pool: sdf-rubin-ingest
+    metallb.io/address-pool: sdf-services
 spec:
   type: LoadBalancer
+  allocateLoadBalancerNodePorts: false
   ports:
   - name: redis
     port: 6379
