@@ -3,7 +3,7 @@
 # Testing workflow: see DEVELOPER-TESTING.md in this directory.
 images:
   - name: ghcr.io/lsst-dm/embargo-butler-enqueue
-    newTag: "1.3.3"
+    newTag: "DM-54533"
   - name: ghcr.io/lsst-dm/embargo-butler-ingest
     newTag: "DM-54386"
   - name: ghcr.io/lsst-dm/embargo-butler-idle
