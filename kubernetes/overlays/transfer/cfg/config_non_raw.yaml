@@ -1,0 +1,11 @@
+- instrument: LSSTCam
+  where: ""
+  embargo_hours: 80
+  dataset_types: "*"
+  collections: "LSSTCam/runs/nightlyValidation"
+  avoid_dstypes_from_collections:
+  - "refcats/*"
+  - "skymaps"
+  - "pretrained_models/*"
+  - "LSSTCam/raw/all"
+  - "LSSTCam/calib/*"
