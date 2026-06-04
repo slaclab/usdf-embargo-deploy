@@ -1,137 +1,207 @@
-# Testing embargo-butler on usdf-embargo-dmz-dev (`test` namespace)
+# Testing embargo-butler (Kafka notification path)
 
-This guide documents how to validate **notify → Redis → ingest → Butler** for the **`kubernetes/overlays/test`** kustomize overlay (Kubernetes namespace **`test`** on **usdf-embargo-dmz-dev**). It reflects behavior verified on-cluster.
+This guide documents how to validate **Kafka notification → enqueue → Redis → ingest → Butler** for embargo-butler, in both environments:
 
-**Manifests** for this environment live in **this directory**. The S3 notification simulator is **`scripts/trigger_ingest_dmz_dev.py`** (same directory layout as **[embargo-butler](https://github.com/lsst-dm/embargo-butler)** for convenience). Service source remains in **embargo-butler**.
+| Environment | k8s namespace | vcluster | Butler repo |
+|-------------|---------------|----------|-------------|
+| **dev** | `test` | usdf-embargo-dmz-dev | `/butler` (SQLite on a PVC, created by the ingest initContainer; isolated from prod) |
+| **prod** | `summit-new` | usdf-embargo-dmz | `s3://embargo@rubin-summit-users/butler.yaml` (shared production registry) |
 
-## Dev vs production Butler
+> **Notification path changed (DM-54533).** `enqueue` no longer runs an HTTP `/notify`
+> webhook. It is now a **Kafka consumer** of the RGW S3 `ObjectCreated` notifications.
+> There is no enqueue LoadBalancer/port-forward to reach anymore; to inject a test
+> notification you **produce a message onto the Kafka topic** with
+> **`scripts/trigger_ingest_dmz_dev_for_kafka.py`** (the older
+> `trigger_ingest_dmz_dev.py` posted to the retired webhook and should not be used).
 
-| Environment | Typical `BUTLER_REPO` | Notes |
-|-------------|----------------------|--------|
-| **usdf-embargo-dmz** (prod-style) | `s3://embargo@rubin-summit-users/butler.yaml` | Shared production registry. |
-| **usdf-embargo-dmz-dev** (`test`) | `/butler` | **SQLite on a PVC** (`butler-data-pvc`). Created by the ingest **initContainer** (`butler create`, `register-instrument`, etc.). Isolated from prod. |
-
-Ingest in this overlay reads **`BUTLER_REPO`** from `ingest-deploy.yaml` (path `/butler`). Raw files stay on **embargo S3** (`transfer="direct"`); the PVC holds **registry + sqlite**, not the FITS pixels.
+Raw files stay on **embargo S3** (`transfer="direct"`); in dev the PVC holds **registry + sqlite**, not the FITS pixels.
 
 ## Prerequisites
 
-- `kubectl` context pointed at **usdf-embargo-dmz-dev**; access to namespace **`test`**.
-- **Vault:** `VAULT_ADDR`, `vault login`. With `make apply` from **`kubernetes/overlays/test`**, secrets are read from **`secret/rubin/usdf-embargo-dmz-dev/test`** (`ENV` is the directory name `test`). Required fields: **`notification`**, **`profile`**, **`redis`**, **`db-auth.yaml`** (may be empty for SQLite-only ingest).
-- **Deploy:** from **`kubernetes/overlays/test`**, run **`make apply`** (creates `etc/.secrets/`, applies kustomize, removes local secret files). Or populate `etc/.secrets/` yourself and run **`kubectl apply -k .`**.
-- Reach enqueue **LoadBalancer** or port-forward: service **`embargo-butler-enqueue`**, port **8080** (maps to container port 8000).
+- `kubectl` context pointed at the right vcluster, with access to the namespace
+  (`test` for dev, `summit-new` for prod).
+- **Rubin stack** sourced (for `lsst.resources` and `confluent-kafka`, which ship with
+  `lsst-scipipe-13.0.0`). `lsst.daf.butler` is only needed when you pass `--host-butler`.
+- **Vault:** `export VAULT_ADDR=https://vault.slac.stanford.edu` and `vault login -method=ldap`
+  (the trigger reads the S3 `profile` field from Vault to list S3 and gate records on existence).
+- The trigger talks to Redis for `--force` via `kubectl exec redis-0`, so your `kubectl`
+  context must reach the target namespace.
 
-## Simulate S3 notifications: `scripts/trigger_ingest_dmz_dev.py`
+## Simulate a notification: `scripts/trigger_ingest_dmz_dev_for_kafka.py`
 
-Run from **`kubernetes/overlays/test`** (this directory) on a host with Rubin stack + Vault + `kubectl` as needed:
+The script builds the same S3 `ObjectCreated` event JSON that RGW publishes and produces
+**one Kafka message per obs_id**. It only emits records for objects that actually exist on
+S3 (`ResourcePath(...).exists()`), so non-existent/untaken sequences are skipped.
+
+### Dev (`test` namespace)
+
+Defaults already target dev (`KAFKA_CLUSTER=172.24.10.50:9094`,
+`KAFKA_TOPIC=prompt-processing-dev-20260114`,
+`VAULT_SECRET_MOUNT_PATH=secret/rubin/usdf-embargo-dmz-dev/test`, namespace `test`):
 
 ```bash
-cd kubernetes/overlays/test   # or path to this overlay in your clone
 export VAULT_ADDR=https://vault.slac.stanford.edu
 vault login -method=ldap
-# Optional if no LoadBalancer IP:
-# kubectl port-forward -n test svc/embargo-butler-enqueue 8080:8080
 
-python3 scripts/trigger_ingest_dmz_dev.py MC_O_20260324_000404
-python3 scripts/trigger_ingest_dmz_dev.py MC_O_20260324_000404_R22_S11   # single detector
+python3 scripts/trigger_ingest_dmz_dev_for_kafka.py MC_O_20260324_000404
+python3 scripts/trigger_ingest_dmz_dev_for_kafka.py MC_O_20260324_000404_R22_S11   # single detector
 ```
+
+### Prod (`summit-new` namespace)
+
+Override the Kafka destination, the Vault path, and the namespace used by `--force`:
+
+```bash
+export VAULT_ADDR=https://vault.slac.stanford.edu
+vault login -method=ldap
+
+KAFKA_CLUSTER=172.24.10.54:9094 \
+KAFKA_TOPIC=rubin-summit-notification-8 \
+VAULT_SECRET_MOUNT_PATH=secret/rubin/usdf-embargo-dmz/summit-new \
+EMBARGO_K8S_NAMESPACE=summit-new \
+  python3 scripts/trigger_ingest_dmz_dev_for_kafka.py MC_O_20260603_000258
+```
+
+> ⚠️ **`rubin-summit-notification-8` is the shared production topic** — RGW publishes real
+> notifications to it and other consumers (e.g. Prompt Processing) read from it. Anything you
+> produce is visible to every consumer group. For a smoke test, prefer re-notifying an exposure
+> that is **already ingested** (you'll just see `Already ingested`), and/or pass `--host-butler`
+> so the script queries the real Butler and only emits records for **not-yet-ingested** detectors.
 
 ### Observation ID format (important)
 
 - Use an **observation id**, **not** a filename.
-- **Correct:** `MC_O_<day_obs>_<seq>` or `MC_O_<day_obs>_<seq>_R<raft>_S<sensor>` (e.g. `MC_O_20260324_000404_R22_S11`).
-- **Wrong:** `..._R22_S11.fits` — the `.fits` suffix breaks parsing and produces bad S3 keys; you may get **HTTP 200** with **no OID lines** and nothing enqueued.
+- **Correct:** `MC_O_<day_obs>_<seq>` or `MC_O_<day_obs>_<seq>_R<raft>_S<sensor>`
+  (e.g. `MC_O_20260324_000404_R22_S11`).
+- **Wrong:** `..._R22_S11.fits` — the `.fits` suffix breaks parsing and produces bad S3 keys
+  (you'll get no OID lines and nothing produced).
 
-### What “success” looks like from the trigger
+### What "success" looks like from the trigger
 
-- **Stderr:** `# notify=http://<enqueue>:8080/notify ...`
-- **Stdout:** one line per **OID** actually sent (object must exist on S3 per `ResourcePath(...).exists()`).
-- **HTTP:** `200` — still check for **printed OIDs**; empty `Records` can still return 200.
+- **Stderr:** `# kafka=<bootstrap>  topic=<topic>  skip_host_butler=True  force=<bool>  namespace=<ns>`
+- **Stdout:** one line per **OID** actually sent (object exists on S3).
+- **Stderr:** `# produced obs_id=<id> partition=<p> offset=<o>` per exposure
+  (or `# FAILED obs_id=<id>: <err>` on a delivery error).
+
+### Re-triggering an already-seen path: `--force`
+
+`enqueue` keeps an `ENQ:<path>` dedupe key for 24h, so re-producing a path enqueued in the last
+day is **skipped** (you'll see `Skipping duplicate enqueue …` in enqueue logs). `--force` DELs
+those keys in Redis (`kubectl exec redis-0`) just before producing:
+
+```bash
+python3 scripts/trigger_ingest_dmz_dev_for_kafka.py --force --namespace summit-new MC_O_20260603_000258
+```
+
+> **Known limitation:** for a full-focal-plane LSSTCam exposure (~197 paths) the single
+> `kubectl exec … DEL <all keys>` can exceed the API-server/nginx URI limit (**HTTP 414**) and
+> the DEL silently fails, so the re-trigger gets deduped and nothing ingests. If you hit that,
+> clear the keys **inside the pod** by pattern instead:
+>
+> ```bash
+> kubectl -n summit-new exec redis-0 -- sh -c \
+>   'redis-cli -a "$REDIS_PASSWORD" --no-auth-warning --scan --pattern "ENQ:*MC_O_20260603_000258*" \
+>      | xargs -r redis-cli -a "$REDIS_PASSWORD" --no-auth-warning DEL'
+> ```
+>
+> then re-run the trigger **without** `--force`. (Note: an already-ingested exposure will still
+> only log `Already ingested` — raws are immutable.)
 
 ### S3 credentials for local checks
 
-- **`EMBARGO_AWS_CREDENTIALS_FILE`** is only read by **`trigger_ingest_dmz_dev.py`** (the script copies it to `AWS_SHARED_CREDENTIALS_FILE`).
-- For ad-hoc **`python -c`** / **`ResourcePath`**, set **`AWS_SHARED_CREDENTIALS_FILE`** and **`AWS_ENDPOINT_URL`** (e.g. `https://sdfembs3.sdf.slac.stanford.edu` when using the SDF embargo endpoint from Vault).
+- **`EMBARGO_AWS_CREDENTIALS_FILE`** is only read by the trigger (it copies it to
+  `AWS_SHARED_CREDENTIALS_FILE`).
+- For ad-hoc `python -c` / `ResourcePath`, set `AWS_SHARED_CREDENTIALS_FILE` and
+  `AWS_ENDPOINT_URL` (e.g. `https://sdfembs3.sdf.slac.stanford.edu`) yourself.
 
-Persistent credentials file from Vault (does not delete on exit):
+Persistent credentials file from Vault (kept after exit):
 
 ```bash
-python3 scripts/trigger_ingest_dmz_dev.py --aws-credentials-out ~/.aws/embargo-sdf.credentials  # from this overlay directory
+python3 scripts/trigger_ingest_dmz_dev_for_kafka.py --aws-credentials-out ~/.aws/embargo-sdf.credentials
 export AWS_SHARED_CREDENTIALS_FILE=$HOME/.aws/embargo-sdf.credentials
 export AWS_ENDPOINT_URL=https://sdfembs3.sdf.slac.stanford.edu   # if stderr printed it
 ```
 
 ### Listing S3 prefixes with `lsst.resources`
 
-Directory prefixes must end with **`/`** or `walk()` raises *non-directory URI*.
+Directory prefixes must end with `/` or `walk()` raises *non-directory URI*.
 
 ```python
-p = ResourcePath("s3://embargo@rubin-summit/LSSTCam/20260324/")
+p = ResourcePath("s3://embargo@rubin-summit/LSSTCam/20260603/")
 for c in p.walk():
     ...
 ```
 
 ## Redis (password required)
 
-Redis uses **`--requirepass`**. Kustomize **`secretGenerator`** creates a secret named **`redis-<hash>`**, not bare `redis`.
+Redis uses `--requirepass`. Kustomize `secretGenerator` creates a secret named `redis-<hash>`,
+not bare `redis`. Use the password already injected in the pod (works in either namespace —
+swap `-n test` / `-n summit-new`):
 
 ```bash
-kubectl get secrets -n test | grep redis
-REDIS_PASS=$(kubectl get secret -n test redis-<suffix> -o jsonpath='{.data.redis-password}' | base64 -d)
-kubectl exec -n test redis-0 -- redis-cli -a "$REDIS_PASS" PING
+kubectl -n summit-new exec redis-0 -- sh -c 'redis-cli -a "$REDIS_PASSWORD" PING'
+
+# Queue for the LSSTCam summit embargo bucket; should drain toward 0 as ingest works:
+kubectl -n summit-new exec redis-0 -- sh -c 'redis-cli -a "$REDIS_PASSWORD" --no-auth-warning LLEN QUEUE:embargo@rubin-summit'
 ```
 
-Queue used for LSSTCam summit embargo bucket: **`QUEUE:embargo@rubin-summit`**.
-
-Using the password already injected in the Redis pod:
+## Enqueue logs (Kafka consumer)
 
 ```bash
-kubectl exec -n test redis-0 -- sh -c 'redis-cli -a "$REDIS_PASSWORD" PING'
+kubectl -n summit-new logs deploy/embargo-butler-enqueue --since=5m | grep -E "Enqueued|Skipping duplicate"
 ```
 
-## Enqueue logs
-
-On successful accept you should see a line like:
-
-`Enqueued embargo@rubin-summit/LSSTCam/.../....fits to embargo@rubin-summit`
-
-If **`opaqueData`** does not match **`NOTIFICATION_SECRET`**, records are skipped (possible **200** with no enqueue lines).
+- On startup: `Kafka consumer started: topic=… cluster=… group=…`.
+- On accept: `Enqueued embargo@rubin-summit/LSSTCam/.../....fits to embargo@rubin-summit`.
+- On a live dedupe key: `Skipping duplicate enqueue …` (use `--force`, or clear the `ENQ:` keys).
 
 ## Ingest logs
 
-Look for **`Ingesting [ResourcePath("s3://...")]`**, then **`Ingested FileDataset(...)`**, and (for non-LFA) **`Defined visits for {...}`** after `on_exposure_record`.
-
-## Butler inside the ingest pod
-
-The container **`WORKDIR`** is the stack root; **`loadLSST.bash`** is **not** under `$HOME`. Use:
+In prod there are 8 ingest replicas (`app=ingest`); tail them all:
 
 ```bash
-source /opt/lsst/software/stack/loadLSST.bash && setup lsst_obs
+kubectl -n summit-new logs -l app=ingest --all-containers --prefix --since=5m --max-log-requests=10 \
+  | grep -E "Ingesting|Ingested FileDataset|Already ingested|Defined visits"
 ```
 
-### Collections and queries
+Look for `Ingesting [ResourcePath("s3://...")]`, then `Ingested FileDataset(...)`, and (non-LFA)
+`Defined visits for {...}`. `Already ingested` is the expected result when re-notifying an
+exposure that is already in the Butler.
 
-After a successful raw ingest, a **RUN** **`LSSTCam/raw/all`** appears. **`butler query-datasets`** must include **`--collections`** (mandatory in newer middleware).
+## Verify in the Butler
+
+**Dev** (SQLite `/butler`, inside the ingest pod — `loadLSST.bash` is at the stack root):
 
 ```bash
-kubectl exec -n test deploy/embargo-butler-ingest -c ingest -- bash -lc \
-  'source /opt/lsst/software/stack/loadLSST.bash && setup lsst_obs && \
-   butler query-collections /butler'
-
-kubectl exec -n test deploy/embargo-butler-ingest -c ingest -- bash -lc \
+kubectl -n test exec deploy/embargo-butler-ingest -c ingest -- bash -lc \
   'source /opt/lsst/software/stack/loadLSST.bash && setup lsst_obs && \
    butler query-datasets --collections LSSTCam/raw/all /butler "*"'
 ```
 
-`butler query-dataset-types /butler` lists registered types. The init container registers **`guider_raw`**; **`raw`** for science data is registered when **`RawIngestTask`** ingests (dimensions match the instrument/stack, e.g. `band`, `instrument`, `day_obs`, `detector`, `group`, `physical_filter`, `exposure` for LSSTCam in current stacks).
+**Prod** (shared registry; from a stack-sourced shell on a login node — `embargo_new` is the
+usual repo alias for `s3://embargo@rubin-summit-users/butler.yaml`). `query-datasets` requires
+`--collections`:
+
+```bash
+butler query-datasets embargo_new raw --collections LSSTCam/raw/all \
+  --where "instrument='LSSTCam' AND day_obs=20260603 AND exposure.seq_num=258"
+```
+
+After a successful raw ingest a RUN `LSSTCam/raw/all` exists; `butler query-collections` lists it.
 
 ## End-to-end checklist
 
-1. **Trigger:** OID lines printed + **200**.
-2. **Enqueue:** log line **`Enqueued ... to embargo@rubin-summit`**.
-3. **Ingest:** **`Ingested FileDataset`** with **`raw`** and **`run='LSSTCam/raw/all'`**.
-4. **Butler:** **`butler query-collections /butler`** shows **`LSSTCam/raw/all`**; **`query-datasets`** with **`--collections LSSTCam/raw/all`** lists rows.
+1. **Trigger:** OID lines printed + `# produced obs_id=… partition=… offset=…`.
+2. **Enqueue:** `Enqueued … to embargo@rubin-summit` (not `Skipping duplicate …`).
+3. **Queue:** `LLEN QUEUE:embargo@rubin-summit` drains toward 0.
+4. **Ingest:** `Ingested FileDataset` (or `Already ingested` for an existing exposure).
+5. **Butler:** `query-datasets --collections LSSTCam/raw/all` returns the rows.
 
 ## Related repositories
 
-- **This repo (`usdf-embargo-deploy`):** `kubernetes/overlays/test/` manifests, **`scripts/trigger_ingest_dmz_dev.py`**, and this guide.
-- **[embargo-butler](https://github.com/lsst-dm/embargo-butler):** service source (`src/enqueue.py`, `src/ingest.py`, …). A copy of the trigger script may also live under **`scripts/`** there for development; prefer the path above for dmz-dev testing alongside manifests.
+- **This repo (`usdf-embargo-deploy`):** kustomize overlays (`kubernetes/overlays/test`,
+  `kubernetes/overlays/summit-new`), the Kafka trigger
+  `scripts/trigger_ingest_dmz_dev_for_kafka.py`, the bucket-notification provisioning under
+  `bucket-notifications/`, and this guide.
+- **[embargo-butler](https://github.com/lsst-dm/embargo-butler):** service source
+  (`src/enqueue.py` — Kafka consumer; `src/ingest.py`; `src/presence.py`).
