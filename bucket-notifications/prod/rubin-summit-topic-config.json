@@ -1,8 +1,8 @@
 {
     "TopicConfigurations": [
         {
-            "Id": "rubin-ingest-embargo-new-3",
-            "TopicArn": "arn:aws:sns:rubin-zg::rubin-ingest-embargo-new-3",
+            "Id": "rubin-ingest-embargo-new-4",
+            "TopicArn": "arn:aws:sns:rubin-zg::rubin-ingest-embargo-new-4",
             "Events": [
                 "s3:ObjectCreated:*"
             ]
