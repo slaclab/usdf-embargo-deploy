@@ -260,30 +260,21 @@ class Records:
 
 
 def _force_clear_dedupe(paths: list[str], namespace: str, pod: str = _REDIS_POD) -> None:
-    """DEL ``ENQ:<path>`` keys in the in-cluster Redis so paths can be re-enqueued.
-
-    Talks to the redis pod via ``kubectl exec`` so this script needs neither
-    direct network access to the in-cluster Redis service nor knowledge of the
-    Redis password (the pod sources it from ``$REDIS_PASSWORD``).
-    """
     if not paths:
         return
-    quoted = " ".join(shlex.quote(f"ENQ:{p}") for p in paths)
-    sh_cmd = f'redis-cli -a "$REDIS_PASSWORD" --no-auth-warning DEL {quoted}'
-    cmd = ["kubectl", "exec", "-n", namespace, pod, "--", "sh", "-c", sh_cmd]
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    # Pipe DELs via stdin (redis-cli reads commands from stdin) so the kubectl
+    # exec request URI stays small — full-focal-plane LSSTCam has ~197 paths and
+    # otherwise blows past the API-server/nginx URI limit (HTTP 414).
+    stdin_data = "".join(f"DEL ENQ:{p}\n" for p in paths)
+    cmd = ["kubectl", "exec", "-i", "-n", namespace, pod, "--",
+           "sh", "-c", 'redis-cli -a "$REDIS_PASSWORD" --no-auth-warning']
+    result = subprocess.run(cmd, input=stdin_data, capture_output=True, text=True)
     if result.returncode != 0:
-        print(
-            "# --force kubectl exec DEL failed (rc=%s) ns=%s pod=%s: %s"
-            % (result.returncode, namespace, pod, result.stderr.strip()),
-            file=sys.stderr,
-        )
+        print("# --force DEL failed (rc=%s) ns=%s pod=%s: %s"
+              % (result.returncode, namespace, pod, result.stderr.strip()), file=sys.stderr)
         return
-    print(
-        "# --force cleared %d ENQ:<path> key(s) (redis-cli DEL → %s) ns=%s pod=%s"
-        % (len(paths), result.stdout.strip(), namespace, pod),
-        file=sys.stderr,
-    )
+    print("# --force cleared %d ENQ:<path> key(s) ns=%s pod=%s"
+          % (len(paths), namespace, pod), file=sys.stderr)
 
 
 def _resolve_skip_butler(args: argparse.Namespace) -> bool:
