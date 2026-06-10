@@ -70,7 +70,7 @@ spec:
           readOnly: false
       containers:
       - name: transfer-raws-catchup
-        image: ghcr.io/lsst-dm/transfer-raw:tickets-DM-51296
+        image: ghcr.io/lsst-dm/transfer-raw:tickets-DM-51490
         imagePullPolicy: Always
         env:
         - name: WINDOW
