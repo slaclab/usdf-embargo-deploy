@@ -1,0 +1,35 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sts-embargo-metrics
+  labels:
+    app: metrics
+    site: sts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metrics
+      site: sts
+  template:
+    metadata:
+      labels:
+        app: metrics
+        site: sts
+    spec:
+      containers:
+      - name: metrics
+        image: "ghcr.io/slaclab/rubin-embargo-metrics:latest"
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis
+              key: redis-password
+        - name: REDIS_URL
+          value: redis://redis:6379
+        resources:
+          limits:
+            cpu: "1"
+            memory: "2Gi"
