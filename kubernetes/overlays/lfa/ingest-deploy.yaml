@@ -18,6 +18,11 @@ spec:
         app: ingest-lfa
         site: summit
     spec:
+      securityContext:
+        fsGroup: 4085
+        runAsGroup: 4085
+        runAsNonRoot: true
+        runAsUser: 18296
       initContainers:
       - name: "fix-secret-permissions"
         image: "ghcr.io/lsst-dm/embargo-butler-ingest:prod"
@@ -29,14 +34,29 @@ spec:
           chmod 0400 /secrets/*
         volumeMounts:
         - mountPath: /secrets-raw
-          name: db-auth
+          name: postgres-credentials
           readOnly: true
         - mountPath: /secrets
           name: secrets
       containers:
       - name: ingest
         image: "ghcr.io/lsst-dm/embargo-butler-ingest:prod"
+        command:
+        - "/bin/bash"
+        - "-c"
+        - |
+          export HOME="$TMPDIR"/"$LOGNAME"
+          mkdir -p "$HOME"
+          source loadLSST.bash
+          setup lsst_obs
+          python ingest/ingest.py
         env:
+        - name: TMPDIR
+          value: /tmp
+        - name: SHELL
+          value: /bin/bash
+        - name: LOGNAME
+          value: rubinmgr
         - name: S3_ENDPOINT_URL
           value: https://s3dfrgw.slac.stanford.edu
         - name: REDIS_HOST
@@ -44,7 +64,11 @@ spec:
         - name: BUCKET
           value: rubinobs-lfa-cp
         - name: BUTLER_REPO
-          value: /sdf/group/rubin/repo/main
+          value: /sdf/group/rubin/repo/main/
+        - name: PGUSER
+          value: rubin
+        - name: PGPASSFILE
+          value: /secrets/.lsst/postgres-credentials.txt
         - name: REDIS_PASSWORD
           valueFrom:
             secretKeyRef:
@@ -65,18 +89,24 @@ spec:
             cpu: 500m
             memory: "1Gi"
         volumeMounts:
-        - mountPath: /home/lsst/.lsst
+        - mountPath: /tmp
+          name: temp
+        - mountPath: /secrets/.lsst
           name: secrets
         - mountPath: "/sdf/data/rubin"
           name: "sdf-data-rubin"
         - mountPath: "/sdf/group/rubin"
           name: "sdf-group-rubin"
       volumes:
+      - name: temp
+        emptyDir:
+          sizeLimit: 100Mi
       - name: secrets
-        emptyDir: {}
-      - name: db-auth
+        emptyDir:
+          sizeLimit: 10Mi
+      - name: postgres-credentials
         secret:
-          secretName: db-auth
+          secretName: postgres-credentials
       - name: "sdf-data-rubin"
         persistentVolumeClaim:
           claimName: "sdf-data-rubin"
